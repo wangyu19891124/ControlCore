@@ -32,6 +32,10 @@
 								<option id="gnu.cpp.compiler.mingw.so.debug.option.debugging.level.1815184569" name="Debug Level" superClass="gnu.cpp.compiler.mingw.so.debug.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.other.pic.1697097556" name="Position Independent Code (-fPIC)" superClass="gnu.cpp.compiler.option.other.pic" value="false" valueType="boolean"/>
 								<option id="gnu.cpp.compiler.option.other.other.1351482589" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -std=c++11" valueType="string"/>
+								<option id="gnu.cpp.compiler.option.include.files.331643529" name="Include files (-include)" superClass="gnu.cpp.compiler.option.include.files"/>
+								<option id="gnu.cpp.compiler.option.include.paths.1788545640" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;D:\MariaDB 10.0\include&quot;"/>
+								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.392945182" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.compiler.mingw.so.debug.491552611" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.mingw.so.debug">
@@ -50,9 +54,11 @@
 									<listOptionValue builtIn="false" value="boost_system-mgw48-mt-1_55"/>
 									<listOptionValue builtIn="false" value="boost_date_time-mgw48-mt-1_55"/>
 									<listOptionValue builtIn="false" value="boost_filesystem-mgw48-mt-1_55"/>
+									<listOptionValue builtIn="false" value="mysql"/>
 								</option>
 								<option id="gnu.cpp.link.option.paths.1445765383" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="&quot;D:\MinGW\lib&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;D:\MariaDB 10.0\lib&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.37388277" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>

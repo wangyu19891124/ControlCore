@@ -8,7 +8,13 @@
 #ifndef DATABASE_H_
 #define DATABASE_H_
 
+#include <list>
+
 #include "boost/thread/mutex.hpp"
+#include "boost/thread.hpp"
+#include "boost/scoped_ptr.hpp"
+
+#include "mysql/mysql.h"
 
 #include "Singleton.h"
 #include "ConfigFile.h"
@@ -31,6 +37,9 @@ public:
 	void WaferEnter(const std::string& id, unsigned short unit, unsigned short slot, const std::string state);
 	void WaferExit(const std::string& id, const std::string& state, const std::string& recipe = "");
 
+	std::string QueryLog(const time_point& start_time, const time_point& end_time, unsigned level_mask = 0xFF);
+	std::string QueryData(const time_point& start_time, const time_point& end_time, const std::string& name);
+
 	friend class SingletonT<Database>;
 
 private:
@@ -41,6 +50,9 @@ private:
 	std::list<std::string> m_sql_list;
 	boost::mutex m_list_mtx;
 	boost::mutex m_db_mtx;
+	boost::scoped_ptr<boost::thread> m_thrd;
+
+	MYSQL m_mysql;
 };
 
 #endif /* DATABASE_H_ */
