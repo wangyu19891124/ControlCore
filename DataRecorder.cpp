@@ -9,6 +9,7 @@
 #include "boost/date_time/posix_time/ptime.hpp"
 
 #include "DataRecorder.h"
+#include "Database.h"
 
 
 RecordItem::RecordItem(RecordItemID id, const std::string& name, unsigned interval, boost::function<float ()> f, bool enable)
@@ -66,10 +67,8 @@ void RecordItem::Monitor()
 	{
 		//record data to database
 		float data = m_f();
-		auto record_time = system_clock::now();
-		//TODO
-
-		m_last_record_time = record_time;
+		Database::Instance().RecordData(m_name, data);
+		m_last_record_time = system_clock::now();
 	}
 }
 

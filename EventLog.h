@@ -1,8 +1,8 @@
 #pragma once
 
-#define BOOST_CHRONO_VERSION 2
-#define BOOST_CHRONO_DONT_PROVIDES_DEPRECATED_IO_SINCE_V2_0_0
-
+//#define BOOST_CHRONO_VERSION 2
+//#define BOOST_CHRONO_DONT_PROVIDES_DEPRECATED_IO_SINCE_V2_0_0
+//
 #include <deque>
 
 #include "boost/thread.hpp"
@@ -53,18 +53,14 @@ private:
 	std::string level_to_string(EventLevel level)
 	{
 		std::string str;
-		if(level == EVENT_LEVEL_DEBUG)
-			str = "debug";
-		else if(level == EVENT_LEVEL_INFO)
+		if(level == EVENT_LEVEL_INFO)
 			str = "info";
 		else if(level == EVENT_LEVEL_WARNING)
 			str = "warning";
 		else if(level == EVENT_LEVEL_ERROR)
 			str = "error";
-		else if(level == EVENT_LEVEL_CRITICAL)
-			str = "critical";
-		else if(level == EVENT_LEVEL_EMERGENCY)
-			str = "emergency";
+		else if(level == EVENT_LEVEL_FATAL)
+			str = "fatal";
 
 		return str;
 	}

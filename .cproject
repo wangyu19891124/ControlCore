@@ -36,6 +36,12 @@
 								<option id="gnu.cpp.compiler.option.include.paths.1788545640" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;D:\MariaDB 10.0\include&quot;"/>
 								</option>
+								<option id="gnu.cpp.compiler.option.preprocessor.undef.374786639" name="Undefined symbols (-U)" superClass="gnu.cpp.compiler.option.preprocessor.undef" valueType="undefDefinedSymbols">
+									<listOptionValue builtIn="false" value="__STRICT_ANSI__"/>
+								</option>
+								<option id="gnu.cpp.compiler.option.preprocessor.def.2070852279" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="BOOST_ALL_DYN_LINK"/>
+								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.392945182" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.compiler.mingw.so.debug.491552611" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.mingw.so.debug">
@@ -54,6 +60,8 @@
 									<listOptionValue builtIn="false" value="boost_system-mgw48-mt-1_55"/>
 									<listOptionValue builtIn="false" value="boost_date_time-mgw48-mt-1_55"/>
 									<listOptionValue builtIn="false" value="boost_filesystem-mgw48-mt-1_55"/>
+									<listOptionValue builtIn="false" value="boost_log-mgw48-mt-1_55"/>
+									<listOptionValue builtIn="false" value="boost_log_setup-mgw48-mt-1_55"/>
 									<listOptionValue builtIn="false" value="mysql"/>
 								</option>
 								<option id="gnu.cpp.link.option.paths.1445765383" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">

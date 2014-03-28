@@ -9,6 +9,7 @@
 //#include <codecvt>
 
 #include "boost/filesystem.hpp"
+#include "boost/date_time.hpp"
 
 
 std::string wstring_to_utf8(const std::wstring& src)
@@ -41,6 +42,22 @@ std::string config_fullname(const std::string& config_name)
 	std::wstring wfullpath = boost::filesystem::system_complete(path).native();
 
 	return wstring_to_utf8(wfullpath);
+}
+
+std::string log_folder()
+{
+	std::string path = "./log";
+
+	std::wstring wfullpath = boost::filesystem::system_complete(path).native();
+
+	return wstring_to_utf8(wfullpath);
+}
+
+std::string local_time_string()
+{
+	using namespace boost::posix_time;
+	ptime t = microsec_clock::local_time();
+	return to_iso_string(t);
 }
 
 //std::wstring utf8_to_wstring(const std::string& src)

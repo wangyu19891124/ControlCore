@@ -11,6 +11,7 @@
 
 #include "Database.h"
 #include "EventLevel.h"
+#include "Utility.h"
 
 
 using namespace boost::chrono;
@@ -53,7 +54,7 @@ void Database::Log(unsigned int id, const std::string& level, const std::string&
 {
 	std::stringstream ss;
 	//ss<<boost::chrono::time_fmt(boost::chrono::timezone::local, "%Y-%m-%d %H:%M:%S")<<boost::chrono::system_clock::now();
-	ss<<"call add_log('"<<system_clock::now()<<"', "<<id<<", '"<<level<<"', '"<<info<<"');";
+	ss<<"call add_log('"<<local_time_string()<<"', "<<id<<", '"<<level<<"', '"<<info<<"');";
 
 	boost::mutex::scoped_lock lock(m_list_mtx);
 	m_sql_list.push_back(ss.str());
@@ -62,7 +63,7 @@ void Database::Log(unsigned int id, const std::string& level, const std::string&
 void Database::RecordData(const std::string& name, float data)
 {
 	std::stringstream ss;
-	ss<<"call record_data('"<<system_clock::now()<<"', '"<<name<<"', "<<data<<");";
+	ss<<"call record_data('"<<local_time_string()<<"', '"<<name<<"', "<<data<<");";
 
 	boost::mutex::scoped_lock lock(m_list_mtx);
 	m_sql_list.push_back(ss.str());
@@ -71,7 +72,7 @@ void Database::RecordData(const std::string& name, float data)
 void Database::WaferEnter(const std::string& id, unsigned short unit, unsigned short slot, const std::string state)
 {
 	std::stringstream ss;
-	ss<<"call wafer_enter('"<<id<<"', "<<unit<<", "<<slot<<", '"<<system_clock::now()<<"', '"<<state<<"');";
+	ss<<"call wafer_enter('"<<id<<"', "<<unit<<", "<<slot<<", '"<<local_time_string()<<"', '"<<state<<"');";
 
 	boost::mutex::scoped_lock lock(m_list_mtx);
 	m_sql_list.push_back(ss.str());
@@ -80,7 +81,7 @@ void Database::WaferEnter(const std::string& id, unsigned short unit, unsigned s
 void Database::WaferExit(const std::string& id, const std::string& state, const std::string& recipe)
 {
 	std::stringstream ss;
-	ss<<"call wafer_exit('"<<id<<"', '"<<system_clock::now()<<"', '"<<state<<"', '"<<recipe<<"');";
+	ss<<"call wafer_exit('"<<id<<"', '"<<local_time_string()<<"', '"<<state<<"', '"<<recipe<<"');";
 
 	boost::mutex::scoped_lock lock(m_list_mtx);
 	m_sql_list.push_back(ss.str());
@@ -90,18 +91,14 @@ std::string Database::QueryLog(const time_point& start_time, const time_point& e
 {
 	std::stringstream ss;
 	ss<<"select * from 'dry_etch'.'event_log' where ('time' between '"<<start_time<<"' and '"<<end_time<<"') and ('level' in (";
-	if(level_mask & EVENT_LEVEL_DEBUG)
-		ss<<"'debug', ";
 	if(level_mask & EVENT_LEVEL_INFO)
 		ss<<"'info', ";
 	if(level_mask & EVENT_LEVEL_WARNING)
 		ss<<"'warning', ";
 	if(level_mask & EVENT_LEVEL_ERROR)
 		ss<<"'error', ";
-	if(level_mask & EVENT_LEVEL_CRITICAL)
-		ss<<"'critical', ";
-	if(level_mask & EVENT_LEVEL_EMERGENCY)
-		ss<<"'emergency', ";
+	if(level_mask & EVENT_LEVEL_FATAL)
+		ss<<"'fatal', ";
 
 	ss<<"'')) order by 'time' desc limit 1000;";
 	std::string sql = ss.str();
