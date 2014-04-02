@@ -34,8 +34,12 @@ public:
 	void Terminate();
 	void Log(unsigned int id, const std::string& level, const std::string& info);
 	void RecordData(const std::string& name, float data);
-	void WaferEnter(const std::string& id, unsigned short unit, unsigned short slot, const std::string state);
-	void WaferExit(const std::string& id, const std::string& state, const std::string& recipe = "");
+	void WaferEnter(const std::string& id, int unit, unsigned short slot, const std::string state);
+	void WaferExit(const std::string& id, const std::string& state);
+	void ProcessStart(const std::string& id, int unit, const std::string& recipe = "");
+	void ProcessEnd(const std::string& id);
+	void CreateWafer(const std::string& id, const std::string& type, const std::string& size);
+	void RemoveWafer(const std::string& id);
 
 	std::string QueryLog(const time_point& start_time, const time_point& end_time, unsigned level_mask = 0xFF);
 	std::string QueryData(const time_point& start_time, const time_point& end_time, const std::string& name);

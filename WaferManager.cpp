@@ -5,6 +5,11 @@
  *      Author: acm
  */
 
+#include <iomanip>
+#include <sstream>
+
+#include "boost/date_time.hpp"
+
 #include "WaferManager.h"
 
 void WaferManager::Initialize()
@@ -22,13 +27,13 @@ void WaferManager::CreateWafer(int unit, const std::string& casset_id, WaferSize
 	mapping = mapping & DEFAULT_FOUP_MAPPING;
 
 	boost::mutex::scoped_lock lock(m_mtx);
-	for(int i=0; i<MAX_SLOT_NUM; i++)
+	for(unsigned short i=0; i<MAX_SLOT_NUM; i++)
 	{
 		int index = unit*100 + i;
 		bool flag = mapping & 0x1;
 		if(flag)
 		{
-			m_wafers[index] = boost::shared_ptr<Wafer>(new Wafer(casset_id, unit, i, size, type));
+			m_wafers[index] = boost::shared_ptr<Wafer>(new Wafer(generate_wafer_id(casset_id), unit, i, size, type));
 		}
 		mapping = mapping>>1;
 		if(mapping == 0)
@@ -229,4 +234,14 @@ unsigned short WaferManager::GetUnprocessedWaferSlot(int unit, unsigned int mapp
 	}
 
 	return MAX_SLOT_NUM;
+}
+
+std::string WaferManager::generate_wafer_id(const std::string& casset_id)
+{
+	using namespace boost::posix_time;
+	ptime t = second_clock::local_time();
+	std::stringstream ss;
+	ss<<to_iso_string(t).substr(2, 6)<<std::setw(4)<<std::setfill('0')<<((m_count++)%10000);
+
+	return ss.str();
 }

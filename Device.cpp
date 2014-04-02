@@ -10,15 +10,9 @@
 
 const unsigned int MAX_BLOCK_IO_NUM = 1024;
 
-Device::Device()
+bool Device::IsSimulator()
 {
-	// TODO Auto-generated constructor stub
-
-}
-
-Device::~Device()
-{
-	// TODO Auto-generated destructor stub
+	return false;
 }
 
 unsigned int Device::Follow(unsigned block, boost::function<void ()> f)

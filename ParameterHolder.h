@@ -25,24 +25,28 @@ public:
 	}
 
 	template<typename T>
-	T Read(const std::string& path, const T& default_value)
+	T Read(const std::string& path, const std::string& name, const T& default_value)
 	{
+		std::string full_path = "Parameters/" + path + "/" + name;
 		boost::mutex::scoped_lock lock(m_mtx);
 
-		return m_cfg_file.Read(path, default_value);
+		return m_cfg_file.Read(full_path, default_value);
 	}
 
 	template<typename T>
-	void Write(const std::string& path, const T& value)
+	void Write(const std::string& path, const std::string& name, const T& value)
 	{
+		std::string full_path = "Parameters/" + path + "/" + name;
 		boost::mutex::scoped_lock lock(m_mtx);
-		m_cfg_file.Write(path, value);
+		m_cfg_file.Write(full_path, value);
 	}
-
-	std::string ToJson(const std::string& path)
-	{
-		return m_cfg_file.ToString(path);
-	}
+//
+//	std::string ToJson(const std::string& path)
+//	{
+//		std::string full_path = "Parameters/" + path;
+//		boost::mutex::scoped_lock lock(m_mtx);
+//		return m_cfg_file.ToString(full_path);
+//	}
 
 	friend class SingletonT<ParameterHolder>;
 

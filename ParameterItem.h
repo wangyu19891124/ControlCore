@@ -8,29 +8,27 @@
 #ifndef PARAMETERITEM_H_
 #define PARAMETERITEM_H_
 
+#include "boost/property_tree/ptree.hpp"
+
 #include "ParameterHolder.h"
-#include "SystemParameter.h"
 
 class ParameterItemBase
 {
 public:
-	ParameterItemBase(int id, const std::string& path, const std::string& description, const std::string& unit = "")
-	: m_description(description), m_unit(unit)
-	{
-		m_path = "Parameter/" + path;
-		SystemParameter::Instance().Mapping(id, this);
-	}
+	ParameterItemBase(int id, const std::string& name, const std::string& path,
+			const std::string& description, const std::string& unit = "");
 	ParameterItemBase() = delete;
 	ParameterItemBase(const ParameterItemBase&) = delete;
 	virtual ~ParameterItemBase(){};
 	ParameterItemBase& operator = (const ParameterItemBase&) = delete;
 
-	const std::string& GetPath()
-	{
-		return m_path;
-	}
+	bool IsChild(const std::string& path);
+
+	virtual void Serialize(boost::property_tree::ptree& pt) = 0;
 
 protected:
+	int m_id;
+	std::string m_name;
 	std::string m_path;
 	std::string m_description;
 	std::string m_unit;
@@ -41,11 +39,11 @@ template<typename T>
 class ParameterItem : public ParameterItemBase
 {
 public:
-	ParameterItem(int id, const std::string& path, const std::string& description,
+	ParameterItem(int id, const std::string& name,  const std::string& path,const std::string& description,
 			T min_value, T max_value, T default_value, const std::string& unit = "")
-		: ParameterItemBase(id, path, description, unit), m_min(min_value), m_max(max_value), m_default(default_value)
+		: ParameterItemBase(id, path, name, description, unit), m_min(min_value), m_max(max_value), m_default(default_value)
 	{
-		m_value = ParameterHolder::Instance().Read<T>(path, default_value);
+		m_value = ParameterHolder::Instance().Read<T>(path, name, default_value);
 	}
 	~ParameterItem(void){};
 
@@ -67,10 +65,19 @@ public:
 				boost::mutex::scoped_lock lock(m_mtx);
 				m_value = rhs;
 			}
-			ParameterHolder::Instance().Write<T>(m_path, rhs);
+			ParameterHolder::Instance().Write<T>(m_path, m_name, rhs);
 		}
 
 		return rhs;
+	}
+
+	virtual void Serialize(boost::property_tree::ptree& pt)
+	{
+		using namespace boost::property_tree;
+		ptree node;
+		node.add<int>("id", m_id);
+		node.add<T>("value", m_value);
+		pt.push_back(make_pair("", node));
 	}
 
 private:
@@ -84,10 +91,10 @@ template<>
 class ParameterItem<std::string> : public ParameterItemBase
 {
 public:
-	ParameterItem(int id, const std::string& path, const std::string& description, std::string default_value)
+	ParameterItem(int id, const std::string& name, const std::string& path, const std::string& description, std::string default_value)
 		: ParameterItemBase(id, path, description, ""), m_default(default_value)
 	{
-		m_value = ParameterHolder::Instance().Read<std::string>(path, default_value);
+		m_value = ParameterHolder::Instance().Read<std::string>(path, name, default_value);
 	}
 	~ParameterItem(void){};
 
@@ -109,9 +116,18 @@ public:
 			boost::mutex::scoped_lock lock(m_mtx);
 			m_value = rhs;
 		}
-		ParameterHolder::Instance().Write(m_path, rhs);
+		ParameterHolder::Instance().Write(m_path, m_name, rhs);
 
 		return *this;
+	}
+
+	virtual void Serialize(boost::property_tree::ptree& pt)
+	{
+		using namespace boost::property_tree;
+		ptree node;
+		node.add<int>("id", m_id);
+		node.add("value", m_value);
+		pt.push_back(make_pair("", node));
 	}
 
 private:

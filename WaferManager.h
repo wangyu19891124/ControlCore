@@ -23,7 +23,7 @@ const unsigned short MAX_SLOT_NUM = 25;
 class WaferManager : public SingletonT<WaferManager>
 {
 protected:
-	WaferManager() = default;
+	WaferManager() : m_count(0) {};
 	WaferManager(const WaferManager&) = delete;
 	WaferManager& operator = (const WaferManager&) = delete;
 public:
@@ -35,7 +35,7 @@ public:
 	friend class SingletonT<WaferManager>;
 
 public:
-	void CreateWafer(int unit, const std::string& casset_id, WaferSize size, WaferType type = Wafer_Unprocessed, unsigned int mapping = 0x1);
+	void CreateWafer(int unit, const std::string& casset_id, WaferSize size, WaferType type = WaferType_Product, unsigned int mapping = 0x1);
 	void RemoveWafer(int unit, unsigned int mapping = 0x1);
 
 	void Transfer(int src_unit, unsigned short src_slot, int dest_unit, unsigned short dest_slot);
@@ -57,8 +57,12 @@ public:
 	unsigned short GetUnprocessedWaferSlot(int unit, unsigned int mapping = DEFAULT_FOUP_MAPPING);
 
 private:
+	std::string generate_wafer_id(const std::string& casset_id);
+
+private:
 	std::map<int, boost::shared_ptr<Wafer> > m_wafers;
 	boost::mutex m_mtx;
+	unsigned int m_count;
 };
 
 #endif /* WAFERMANAGER_H_ */

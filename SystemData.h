@@ -60,11 +60,14 @@ public:
 	{
 		return m_id;
 	}
+	bool HasChanged();
+	bool IsChild(const std::string& path);
 
 protected:
 	int m_id;
 	std::string m_name;
 	std::string m_path;
+	bool m_changed_flag;
 };
 
 template<typename T>
@@ -99,10 +102,17 @@ public:
 			throw ss.str();
 		}
 
-		if(rhs<=m_max && rhs>=m_min)
+		if(rhs<=m_max && rhs>=m_min && rhs!=m_data)
 		{
 			boost::mutex::scoped_lock lock(m_mtx);
+			for(boost::function<bool (T)> &f : m_precheck_funcs)
+			{
+				if(f(rhs))
+					return *this;
+			}
+
 			m_data = rhs;
+			m_changed_flag = true;
 		}
 		else
 		{
@@ -110,12 +120,6 @@ public:
 			std::stringstream ss;
 			ss<<m_name<<" is assigned "<<rhs<<", it's out of range ["<<m_min<<", "<<m_max<<"].";
 			throw ss.str();
-		}
-
-		for(boost::function<bool (T)> &f : m_precheck_funcs)
-		{
-			if(f(rhs))
-				return *this;
 		}
 
 		WriteData();
@@ -127,9 +131,13 @@ public:
 	{
 		using namespace boost::property_tree;
 		ptree node;
-		node.add<int>("<xmlattr>.id", m_id);
-		node.add<T>("<xmlattr>.value", m_data);
-		pt.add_child("SystemData.Data", node);
+		node.add<int>("id", m_id);
+		{
+			boost::mutex::scoped_lock lock(m_mtx);
+			node.add<T>("value", m_data);
+			m_changed_flag = false;
+		}
+		pt.push_back(make_pair("", node));
 	}
 
 	virtual const std::type_info& GetType()
@@ -167,6 +175,7 @@ public:
 
 	void AddPrecheck(boost::function<bool (T)> checker)
 	{
+		boost::mutex::scoped_lock lock(m_mtx);
 		m_precheck_funcs.push_back(checker);
 	}
 
@@ -219,9 +228,12 @@ private:
 		if(m_get_func)
 			raw = m_get_func();
 
-		m_data = m_raw_to_real(raw);
-
 		boost::mutex::scoped_lock lock(m_mtx);
+		T old_data = m_data;
+		m_data = m_raw_to_real(raw);
+		if(m_data != old_data)
+			m_changed_flag = true;
+
 		for(boost::function<void (T)>& f : m_update_sinks)
 		{
 			if(f)
@@ -271,7 +283,11 @@ public:
 	SystemData& operator = (const std::string& rhs)
 	{
 		boost::mutex::scoped_lock lock(m_mtx);
-		m_data = rhs;
+		if(m_data != rhs)
+		{
+			m_data = rhs;
+			m_changed_flag = true;
+		}
 		return *this;
 	}
 
@@ -279,8 +295,12 @@ public:
 	{
 		using namespace boost::property_tree;
 		ptree node;
-		node.add<int>("<xmlattr>.id", m_id);
-		node.add<std::string>("<xmlattr>.value", m_data);
+		{
+			boost::mutex::scoped_lock lock(m_mtx);
+			node.add<int>("id", m_id);
+			node.add<std::string>("value", m_data);
+			m_changed_flag = false;
+		}
 		pt.add_child("SystemData.Data", node);
 	}
 

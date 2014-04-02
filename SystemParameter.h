@@ -8,7 +8,7 @@
 #ifndef SYSTEMPARAMETER_H_
 #define SYSTEMPARAMETER_H_
 
-class ParameterItemBase;
+#include "ParameterItem.h"
 
 template<typename T>
 class ParameterItem;
@@ -48,7 +48,24 @@ public:
 
 	std::string GetJsonData(const std::string& path)
 	{
-		return ParameterHolder::Instance().ToJson(path);
+		using namespace boost::property_tree;
+		ptree array;
+		ParameterItemBase* item_ptr = nullptr;
+		for(auto &v : m_cfgs)
+		{
+			item_ptr = v.second;
+			if(item_ptr->IsChild(path))
+			{
+				item_ptr->Serialize(array);
+			}
+		}
+		ptree pt;
+		pt.add_child("parameters", array);
+
+		std::stringstream ss;
+		json_parser::write_json(ss, pt);
+
+		return ss.str();
 	}
 
 	friend class SingletonT<SystemParameter>;

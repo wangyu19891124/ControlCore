@@ -12,20 +12,28 @@
 
 #include "boost/chrono.hpp"
 
+enum WaferState
+{
+	WaferState_Unprocessed,
+	WaferState_Processing,
+	WaferState_Processed,
+	WaferState_Semi_Processed,
+	WaferState_Broken,
+
+};
+
 enum WaferType
 {
-	Wafer_Unprocessed,
-	Wafer_Processing,
-	Wafer_Processed,
-	Wafer_Semi_Processed,
-	Wafer_Broken,
-	Wafer_Dummy,
+	WaferType_Product,
+	WaferType_Dummy,
 };
 
 enum WaferSize
 {
-	WaferSize_8Inch,
-	WaferSize_12Inch,
+	WaferSize_100mm,
+	WaferSize_150mm,
+	WaferSize_200mm,
+	WaferSize_300mm,
 };
 
 typedef std::pair<int, unsigned short> WaferSite;
@@ -34,13 +42,15 @@ typedef boost::chrono::time_point<boost::chrono::system_clock> TimePoint;
 class Wafer
 {
 public:
-	Wafer(const std::string& casset_id, int unit, unsigned short slot, WaferSize size, WaferType type = Wafer_Unprocessed);
+	Wafer(const std::string& id, int unit, unsigned short slot, WaferSize size,
+			WaferType type = WaferType_Product, WaferState state = WaferState_Unprocessed);
 	virtual ~Wafer();
 
 	WaferSite GetOriginalSite();
 //	WaferSite GetSite();
 	WaferType GetType();
 	WaferSize GetSize();
+	WaferState GetState();
 	std::string GetID();
 
 	void Transfer(int dest_unit, unsigned short dest_slot = 0);
@@ -58,13 +68,19 @@ public:
 	bool IsDummy();
 
 private:
-	std::string m_casset_id;
+	std::string wafer_type_to_string(WaferType type);
+	std::string wafer_size_to_string(WaferSize size);
+	std::string wafer_state_to_string(WaferState state);
+
+private:
+	std::string m_id;
 	int m_original_unit;
 	unsigned short m_original_slot;
-//	int m_unit;
-//	unsigned short m_slot;
+	int m_unit;
+	unsigned short m_slot;
 	WaferSize m_size;
 	WaferType m_type;
+	WaferState m_state;
 	std::string m_recipe;
 	TimePoint m_process_start_time;
 	TimePoint m_process_end_time;

@@ -69,7 +69,7 @@ void Database::RecordData(const std::string& name, float data)
 	m_sql_list.push_back(ss.str());
 }
 
-void Database::WaferEnter(const std::string& id, unsigned short unit, unsigned short slot, const std::string state)
+void Database::WaferEnter(const std::string& id, int unit, unsigned short slot, const std::string state)
 {
 	std::stringstream ss;
 	ss<<"call wafer_enter('"<<id<<"', "<<unit<<", "<<slot<<", '"<<local_time_string()<<"', '"<<state<<"');";
@@ -78,10 +78,46 @@ void Database::WaferEnter(const std::string& id, unsigned short unit, unsigned s
 	m_sql_list.push_back(ss.str());
 }
 
-void Database::WaferExit(const std::string& id, const std::string& state, const std::string& recipe)
+void Database::WaferExit(const std::string& id, const std::string& state)
 {
 	std::stringstream ss;
-	ss<<"call wafer_exit('"<<id<<"', '"<<local_time_string()<<"', '"<<state<<"', '"<<recipe<<"');";
+	ss<<"call wafer_exit('"<<id<<"', '"<<local_time_string()<<"', '"<<state<<"');";
+
+	boost::mutex::scoped_lock lock(m_list_mtx);
+	m_sql_list.push_back(ss.str());
+}
+
+void Database::ProcessStart(const std::string& id, int unit, const std::string& recipe)
+{
+	std::stringstream ss;
+	ss<<"call process_start('"<<id<<"', "<<unit<<", '"<<local_time_string()<<"', '"<<recipe<<"');";
+
+	boost::mutex::scoped_lock lock(m_list_mtx);
+	m_sql_list.push_back(ss.str());
+}
+
+void Database::ProcessEnd(const std::string& id)
+{
+	std::stringstream ss;
+	ss<<"call process_end('"<<id<<"', '"<<local_time_string()<<"');";
+
+	boost::mutex::scoped_lock lock(m_list_mtx);
+	m_sql_list.push_back(ss.str());
+}
+
+void Database::CreateWafer(const std::string& id, const std::string& type, const std::string& size)
+{
+	std::stringstream ss;
+	ss<<"call create_wafer('"<<id<<"', '"<<type<<"', '"<<size<<"', '"<<local_time_string()<<"');";
+
+	boost::mutex::scoped_lock lock(m_list_mtx);
+	m_sql_list.push_back(ss.str());
+}
+
+void Database::RemoveWafer(const std::string& id)
+{
+	std::stringstream ss;
+	ss<<"call create_wafer('"<<id<<"', '"<<local_time_string()<<"');";
 
 	boost::mutex::scoped_lock lock(m_list_mtx);
 	m_sql_list.push_back(ss.str());

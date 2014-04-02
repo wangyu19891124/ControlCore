@@ -10,6 +10,6 @@
 namespace Data
 {
 
-SystemData<unsigned> flag(11, "flag", "SystemData/UserDefine", 0, 1000);
+SystemData<unsigned> flag(11, "flag", "UserDefine", 0, 1000);
 
 }

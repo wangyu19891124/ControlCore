@@ -20,17 +20,19 @@ void SystemDataPool::Terminate()
 	m_all_data.clear();
 }
 
-std::string SystemDataPool::ToJson(boost::function<bool (int)> f)
+std::string SystemDataPool::ToJson(boost::function<bool (BaseSystemData*)> f)
 {
 	using namespace boost::property_tree;
-	ptree pt;
+	ptree array;
 	BaseSystemData* data_ptr = nullptr;
 	for(std::map<int, BaseSystemData*>::value_type& v : m_all_data)
 	{
 		data_ptr = v.second;
-		if(data_ptr && (!f || f(v.first)))
-			data_ptr->Serialize(pt);
+		if(data_ptr && (!f || f(data_ptr)))
+			data_ptr->Serialize(array);
 	}
+	ptree pt;
+	pt.add_child("systemdata", array);
 
 	std::stringstream ss;
 	json_parser::write_json(ss, pt);
