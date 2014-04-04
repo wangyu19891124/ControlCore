@@ -1,71 +1,37 @@
 #pragma once
 
-//#define BOOST_CHRONO_VERSION 2
-//#define BOOST_CHRONO_DONT_PROVIDES_DEPRECATED_IO_SINCE_V2_0_0
-//
-#include <deque>
+#include <list>
 
-#include "boost/thread.hpp"
 #include "boost/thread/mutex.hpp"
-#include "boost/shared_ptr.hpp"
-#include "boost/scoped_ptr.hpp"
-#include "boost/chrono.hpp"
+#include "boost/tuple/tuple.hpp"
 
 #include "Singleton.h"
-#include "Database.h"
 #include "EventLevel.h"
 
 class EventLogger : public SingletonT<EventLogger>
 {
+	typedef boost::tuple<std::string, unsigned int, EventLevel, std::string> LogItem;
 protected:
-	EventLogger() : m_filter(0xFF)
-	{
-	};
+	EventLogger();
 	EventLogger(const EventLogger&) = delete;
 	EventLogger& operator = (const EventLogger&) = delete;
 public:
 	~EventLogger() = default;
 
-	void Initialize()
-	{
-	}
-
-	void Terminate()
-	{
-	}
-
-	void SetFilter(unsigned int filter)
-	{
-		m_filter = filter;
-	}
-
-	void Log(unsigned int evt_id, EventLevel evt_level, const std::string& info)
-	{
-		if (evt_level & m_filter)
-		{
-			Database::Instance().Log(evt_id, level_to_string(evt_level), info);
-		}
-	}
+	void Initialize();
+	void Terminate();
+	void SetFilter(unsigned int filter);
+	void Log(unsigned int evt_id, EventLevel evt_level, const std::string& info);
+	std::string FetchLogs();
 
 	friend class SingletonT<EventLogger>;
 
 private:
-	std::string level_to_string(EventLevel level)
-	{
-		std::string str;
-		if(level == EVENT_LEVEL_INFO)
-			str = "info";
-		else if(level == EVENT_LEVEL_WARNING)
-			str = "warning";
-		else if(level == EVENT_LEVEL_ERROR)
-			str = "error";
-		else if(level == EVENT_LEVEL_FATAL)
-			str = "fatal";
-
-		return str;
-	}
+	std::string event_level_to_string(EventLevel level);
 
 private:
+	boost::mutex m_mtx;
 	unsigned int m_filter;
+	std::list<LogItem> m_logs;
 };
 

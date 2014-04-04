@@ -8,9 +8,12 @@
 #include <sstream>
 
 #include "boost/property_tree/json_parser.hpp"
+#include "boost/filesystem.hpp"
 
 #include "ConfigFile.h"
 #include "Utility.h"
+
+const static std::string config_path = "./config/";
 
 ConfigFile::ConfigFile(const std::string& name)
 {
@@ -18,7 +21,7 @@ ConfigFile::ConfigFile(const std::string& name)
 
 	try
 	{
-		m_filename = config_fullname(name);
+		m_filename = config_path + name + ".json";
 		json_parser::read_json(m_filename, m_pt);
 	}
 	catch (...)
@@ -46,5 +49,11 @@ std::string ConfigFile::ToString(const std::string& path)
 void ConfigFile::save_to_file()
 {
 	using namespace boost::property_tree;
+	using namespace boost::filesystem;
+
+	if(!exists(config_path))
+	{
+		create_directory(config_path);
+	}
 	json_parser::write_json(m_filename, m_pt);
 }

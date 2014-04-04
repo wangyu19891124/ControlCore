@@ -17,5 +17,4 @@ enum EventLevel : unsigned int
 	EVENT_LEVEL_FATAL		= 0x08,
 };
 
-
 #endif /* EVENTLEVEL_H_ */

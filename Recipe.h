@@ -9,7 +9,7 @@
 #define RECIPE_H_
 
 #include "boost/property_tree/ptree.hpp"
-#include "boost/property_tree/xml_parser.hpp"
+#include "boost/property_tree/json_parser.hpp"
 
 class RecipeStep
 {
@@ -78,6 +78,11 @@ public:
 	void LoadFromString(const std::string& name, const std::string& recipe);
 	void Save();
 	void Reset();
+
+	std::string Name()
+	{
+		return m_name;
+	}
 
 	float Duration()
 	{

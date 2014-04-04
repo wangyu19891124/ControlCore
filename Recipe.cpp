@@ -67,10 +67,11 @@ void Recipe::Load(const std::string& name)
 	ptree pt;
 	try
 	{
-		xml_parser::read_xml(recipe_fullname(name), pt);
+		std::string recipe_name = "./recipe/" + name + ".rcp";
+		json_parser::read_json(recipe_name, pt);
 		m_name = name;
 		m_steps.clear();
-		for(ptree::value_type &v : pt.get_child("Recipe"))
+		for(ptree::value_type &v : pt.get_child("Steps"))
 		{
 			RecipeStep step;
 			step.Load(v.second);
@@ -92,10 +93,10 @@ void Recipe::LoadFromString(const std::string& name, const std::string& recipe)
 	try
 	{
 		std::istringstream ss(recipe);
-		xml_parser::read_xml(ss, pt);
+		json_parser::read_json(ss, pt);
 		m_name = name;
 		m_steps.clear();
-		for(ptree::value_type &v : pt.get_child("Recipe"))
+		for(ptree::value_type &v : pt.get_child("Steps"))
 		{
 			RecipeStep step;
 			step.Load(v.second);
@@ -120,10 +121,13 @@ void Recipe::Save()
 	{
 		ptree step_pt;
 		step.Save(step_pt);
-		pt.add_child(ptree::path_type("Recipe.Step"), step_pt);
+		pt.push_back(std::make_pair("", step_pt));
 	}
 
-	xml_parser::write_xml(recipe_fullname(m_name), pt);
+	ptree root;
+	root.add_child("Steps", pt);
+
+	json_parser::write_json(recipe_fullname(m_name), root);
 }
 
 void Recipe::Reset()

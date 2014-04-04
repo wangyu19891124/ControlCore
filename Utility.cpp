@@ -35,24 +35,6 @@ std::string recipe_fullname(const std::string& recipe_name)
 	return wstring_to_utf8(wfullpath);
 }
 
-std::string config_fullname(const std::string& config_name)
-{
-	std::string path = "./config/" + config_name + ".json";
-
-	std::wstring wfullpath = boost::filesystem::system_complete(path).native();
-
-	return wstring_to_utf8(wfullpath);
-}
-
-std::string log_folder()
-{
-	std::string path = "./log";
-
-	std::wstring wfullpath = boost::filesystem::system_complete(path).native();
-
-	return wstring_to_utf8(wfullpath);
-}
-
 std::string local_time_string()
 {
 	using namespace boost::posix_time;

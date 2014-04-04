@@ -12,10 +12,6 @@ std::string wstring_to_utf8(const std::wstring& src);
 
 std::string recipe_fullname(const std::string& recipe_name);
 
-std::string config_fullname(const std::string& config_name);
-
-std::string log_folder();
-
 std::string local_time_string();
 
 //std::wstring utf8_to_wstring(const std::string& src);
