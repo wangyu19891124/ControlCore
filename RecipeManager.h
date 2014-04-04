@@ -8,6 +8,8 @@
 #ifndef RECIPEMANAGER_H_
 #define RECIPEMANAGER_H_
 
+#include <list>
+
 #include "Singleton.h"
 #include "Recipe.h"
 

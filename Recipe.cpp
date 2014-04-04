@@ -83,7 +83,6 @@ void Recipe::Load(const std::string& name)
 		//TODO::report system event
 		m_name.clear();
 		m_steps.clear();
-		return;
 	}
 }
 

@@ -45,7 +45,7 @@ void RecipeManager::GetRecipe(Recipe& rcp)
 
 void RecipeManager::GetRecipeList(std::list<std::string>& recipe_list)
 {
-	fs::path recipe_path = fs::system_complete("./recipe");
+	fs::path recipe_path("./recipe");
 	if(!fs::exists(recipe_path) || !fs::is_directory(recipe_path))
 		return;
 
@@ -55,6 +55,7 @@ void RecipeManager::GetRecipeList(std::list<std::string>& recipe_list)
 		if(fs::is_regular_file(dir_itor->path()) && (dir_itor->path().extension() == L".rcp"))
 		{
 			std::wstring wfilename = dir_itor->path().filename().native();
+			wfilename = wfilename.substr(0, wfilename.size()-4);
 			recipe_list.push_back(wstring_to_utf8(wfilename));
 		}
 		++dir_itor;

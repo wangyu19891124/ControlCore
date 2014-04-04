@@ -24,32 +24,32 @@ public:
 	void Load(const boost::property_tree::ptree& pt);
 	void Save(boost::property_tree::ptree& pt);
 
-	const std::string& Name()
+	const std::string& Name() const
 	{
 		return m_name;
 	}
 
-	int N2Flowrate()
+	int N2Flowrate() const
 	{
 		return m_N2_flowrate;
 	}
 
-	int EtOHFlowrate()
+	int EtOHFlowrate() const
 	{
 		return m_EtOH_flowrate;
 	}
 
-	int HFFlowrate()
+	int HFFlowrate() const
 	{
 		return m_HF_flowrate;
 	}
 
-	float Duration()
+	float Duration() const
 	{
 		return m_duration;
 	}
 
-	int Pressure()
+	int Pressure() const
 	{
 		return m_pressure;
 	}
