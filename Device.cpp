@@ -40,10 +40,9 @@ void Device::Notify(unsigned block)
 	boost::recursive_mutex::scoped_lock lock(m_mtx);
 	std::vector<boost::function<void ()>>& notify_list = m_follower[block];
 
-	std::for_each(notify_list.begin(), notify_list.end(),
-			[&](boost::function<void ()> p)
-			{
-				if(p)
-					p();
-			});
+	for(auto& f : notify_list)
+	{
+		if(f)
+			f();
+	}
 }

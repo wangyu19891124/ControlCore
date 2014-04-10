@@ -12,6 +12,7 @@
 #include "Database.h"
 #include "EventLevel.h"
 #include "Utility.h"
+#include "LogFile.h"
 
 
 using namespace boost::chrono;
@@ -22,7 +23,7 @@ void Database::Initialize()
 	if(m_thrd)
 		return;
 
-	std::string hostname = m_cfg_file.Read<std::string>("database/host", "localhost");
+	std::string hostname = m_cfg_file.Read<std::string>("database/host", "127.0.0.1");
 	std::string user = m_cfg_file.Read<std::string>("database/user", "acm");
 	std::string password = m_cfg_file.Read<std::string>("database/password", "acm");
 	std::string database = m_cfg_file.Read<std::string>("database/database", "dry_etch");
@@ -32,7 +33,10 @@ void Database::Initialize()
 	if (!mysql_real_connect(&m_mysql, hostname.c_str(), user.c_str(), password.c_str(),
 			database.c_str(), port, NULL, 0))
 	{
-		throw "Connect database failed.";
+		std::stringstream ss;
+		ss<<"error code: "<<mysql_errno(&m_mysql)<<", error message: "<<mysql_error(&m_mysql);
+		LogFatal(ss.str());
+		throw ss.str();
 	}
 
 	m_thrd.reset(new boost::thread([this](){this->do_work();}));
@@ -144,12 +148,12 @@ std::string Database::QueryLog(const time_point& start_time, const time_point& e
 	MYSQL_RES* result_set;
 	{
 		//execute query
+		LogInfo(sql);
 		boost::mutex::scoped_lock lock(m_db_mtx);
 		int rtv = mysql_query(&m_mysql, sql.c_str());
 		if(!rtv)
 		{
-			//TODO log, report event log
-
+			LogError("mysql query log failed.");
 			return "";
 		}
 
@@ -169,11 +173,13 @@ std::string Database::QueryLog(const time_point& start_time, const time_point& e
 		pt.put("ID", row[1]);
 		pt.put("Level", row[2]);
 		pt.put("Info", row[3]);
-		pt.add_child("Log/LogItem", pt_child);
+		pt.push_back(make_pair("", pt_child));
 	}
 	mysql_free_result(result_set);
 
-	json_parser::write_json(ss, pt);
+	ptree root;
+	root.add_child("LogItems", pt);
+	json_parser::write_json(ss, root);
 
 	return ss.str();
 }
@@ -189,12 +195,12 @@ std::string Database::QueryData(const time_point& start_time, const time_point& 
 	MYSQL_RES* result_set;
 	{
 		//execute query
+		LogInfo(sql);
 		boost::mutex::scoped_lock lock(m_db_mtx);
 		int rtv = mysql_query(&m_mysql, sql.c_str());
 		if(!rtv)
 		{
-			//TODO log, report event log
-
+			LogError("mysql query data failed.");
 			return "";
 		}
 
@@ -213,11 +219,13 @@ std::string Database::QueryData(const time_point& start_time, const time_point& 
 		pt.put("Time", row[0]);
 		pt.put("Type", row[1]);
 		pt.put("Value", row[2]);
-		pt.add_child("Data/Item", pt_child);
+		pt.push_back(make_pair("", pt_child));
 	}
 	mysql_free_result(result_set);
 
-	json_parser::write_json(ss, pt);
+	ptree root;
+	root.add_child("DataRecords", pt);
+	json_parser::write_json(ss, root);
 
 	return ss.str();
 }
@@ -239,12 +247,12 @@ void Database::do_work()
 		}
 		if(!sql.empty())
 		{
+			LogInfo(sql);
 			boost::mutex::scoped_lock lock(m_db_mtx);
 			int rtv = mysql_query(&m_mysql, sql.c_str());
 			if(!rtv)
 			{
-				//TODO log
-
+				LogError("mysql insert failed.");
 			}
 
 			continue;

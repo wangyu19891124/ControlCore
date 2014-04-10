@@ -5,56 +5,60 @@
  *      Author: acm
  */
 
-#include "boost/algorithm/string.hpp"
 #include "boost/property_tree/ptree.hpp"
-#include "boost/property_tree/xml_parser.hpp"
+#include "boost/property_tree/json_parser.hpp"
 
 #include "DeviceManager.h"
+#include "DeviceFactory.h"
+#include "LogFile.h"
 
 void DeviceManager::Initialize()
 {
 	using namespace boost::property_tree;
 	ptree pt;
-	xml_parser::read_xml("./Device.xml", pt);
+
+	try
+	{
+		json_parser::read_json("./config/device.json", pt);
+	}
+	catch(json_parser_error& e)
+	{
+		LogFatal(e.message());
+		throw e;
+	}
+
 	for(ptree::value_type &v : pt.get_child("DeviceList"))
 	{
-		int id = v.second.get<int>("<xmlattr>.id");
-		std::string name = v.second.get<std::string>("<xmlattr>.name");
-		CreateDevice(id, name);
+		int id = v.second.get<int>("id");
+		std::string name = v.second.get<std::string>("name");
+		boost::shared_ptr<Device> dev_ptr = DeviceFactory::CreateDevice(id, name);
+		if(dev_ptr)
+		{
+			dev_ptr->Initialize();
+			m_devices[id] = dev_ptr;
+		}
 	}
 }
 
 void DeviceManager::Terminate()
 {
-	for(std::map<int, Device*>::value_type &v : m_devices)
+	for(auto& v : m_devices)
 	{
 		v.second->Terminate();
-		delete v.second;
-		v.second = nullptr;
+		v.second.reset();
 	}
 	m_devices.clear();
 }
 
-Device& DeviceManager::GetDevice(int id)
+boost::shared_ptr<Device> DeviceManager::GetDevice(int id)
 {
 	auto itor = m_devices.find(id);
-	if(itor != m_devices.end())
-		return *(itor->second);
-	else
+	if(itor == m_devices.end())
 	{
 		std::stringstream ss;
 		ss<<"Device "<<id<<" doesn't exist.";
 		throw ss.str();
 	}
-}
 
-void DeviceManager::CreateDevice(int id, const std::string& dev_name)
-{
-	//assert(id >= 0);
-	if(boost::algorithm::iequals("simulator", dev_name))
-	{
-		//create simulator device and add to container
-	}
-	//else if()
-	//else
+	return itor->second;
 }

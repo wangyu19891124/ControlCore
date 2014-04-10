@@ -150,13 +150,13 @@ public:
 		if(m_id == NoRelatedDevice)
 			return;
 
-		Device& dev = DeviceManager::Instance().GetDevice(m_id);
-		m_get_func = boost::bind(&Device::Read, &dev, m_block, m_io_offset, m_bit_offset, m_bits);
+		boost::shared_ptr<Device> dev_ptr = DeviceManager::Instance().GetDevice(m_id);
+		m_get_func = boost::bind(&Device::Read, dev_ptr, m_block, m_io_offset, m_bit_offset, m_bits);
 		ReadData();
 		if(m_writable)
-			m_put_func = boost::bind(&Device::Write, &dev, _1, m_block, m_io_offset, m_bit_offset, m_bits);
+			m_put_func = boost::bind(&Device::Write, dev_ptr, _1, m_block, m_io_offset, m_bit_offset, m_bits);
 		else
-			m_token = dev.Follow(m_block, boost::bind(&SystemData<T>::ReadData, this));
+			m_token = dev_ptr->Follow(m_block, boost::bind(&SystemData<T>::ReadData, this));
 	}
 
 	virtual void Terminate()
@@ -168,8 +168,8 @@ public:
 			m_put_func.clear();
 		else
 		{
-			Device& dev = DeviceManager::Instance().GetDevice(m_id);
-			dev.Unfollow(m_token);
+			boost::shared_ptr<Device> dev_ptr = DeviceManager::Instance().GetDevice(m_id);
+			dev_ptr->Unfollow(m_token);
 		}
 	}
 

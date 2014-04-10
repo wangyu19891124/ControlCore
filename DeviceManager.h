@@ -23,14 +23,12 @@ public:
 	void Initialize();
 	void Terminate();
 
-	Device& GetDevice(int id);
+	boost::shared_ptr<Device> GetDevice(int id);
 
 	friend class SingletonT<DeviceManager>;
-private:
-	void CreateDevice(int id, const std::string& dev_name);
 
 private:
-	std::map<int, Device*> m_devices;
+	std::map<int, boost::shared_ptr<Device>> m_devices;
 };
 
 #endif /* DEVICEMANAGER_H_ */

@@ -39,4 +39,12 @@ private:
 	boost::log::sources::severity_logger<boost::log::trivial::severity_level> m_lg;
 };
 
+void Log(boost::log::trivial::severity_level level, const std::string& msg);
+void LogTrace(const std::string& msg);
+void LogDebug(const std::string& msg);
+void LogInfo(const std::string& msg);
+void LogWarning(const std::string& msg);
+void LogError(const std::string& msg);
+void LogFatal(const std::string& msg);
+
 #endif /* LOGFILE_H_ */

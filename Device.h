@@ -18,7 +18,7 @@ class Device
 {
 public:
 	Device(int dev_id) : m_dev_id(dev_id) {};
-	virtual ~Device();
+	virtual ~Device() = default;
 
 	virtual bool IsSimulator();
 
@@ -32,8 +32,8 @@ public:
 	virtual void Write(int id, float value) = 0;
 	virtual float Read(int id) = 0;
 
-	virtual unsigned int Follow(unsigned block, boost::function<void ()> f);
-	virtual void Unfollow(unsigned token);
+	unsigned int Follow(unsigned block, boost::function<void ()> f);
+	void Unfollow(unsigned token);
 
 protected:
 	void Notify(unsigned block);

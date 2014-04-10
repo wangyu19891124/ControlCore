@@ -33,3 +33,39 @@ void LogFile::Write(trivial::severity_level level, const std::string& msg)
 {
 	BOOST_LOG_SEV(m_lg, level)<<msg;
 }
+
+void Log(boost::log::trivial::severity_level level, const std::string& msg)
+{
+	LogFile::Instance().Write(level, msg);
+}
+
+void LogTrace(const std::string& msg)
+{
+	Log(trivial::trace, msg);
+}
+
+void LogDebug(const std::string& msg)
+{
+	Log(trivial::debug, msg);
+}
+
+void LogInfo(const std::string& msg)
+{
+	Log(trivial::info, msg);
+}
+
+void LogWarning(const std::string& msg)
+{
+	Log(trivial::warning, msg);
+}
+
+void LogError(const std::string& msg)
+{
+	Log(trivial::error, msg);
+}
+
+void LogFatal(const std::string& msg)
+{
+	Log(trivial::fatal, msg);
+}
+
