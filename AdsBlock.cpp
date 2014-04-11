@@ -9,6 +9,7 @@
 #include <algorithm>
 
 #include "boost/regex.hpp"
+#include "boost/lexical_cast.hpp"
 
 #include "AdsBlock.h"
 
@@ -80,11 +81,11 @@ static unsigned long long bits_mask[64] =
 		0xFFFFFFFFFFFFFFFF
 };
 
-AdsBlock::AdsBlock(int id, const std::string& name, const std::string& var_name, const std::string& ip,
+AdsBlock::AdsBlock(unsigned id, const std::string& name, const std::string& var_name, const std::string& ip,
 		unsigned short port, unsigned short read_start, unsigned short read_end,
 		unsigned short write_start, unsigned short write_end) :
-		m_id(id), m_name(name), m_var_name(var_name), m_read_start(read_start),
-		m_read_end(read_end), m_write_start(write_start), m_write_end(write_end), m_handle(0)
+		Block(id), m_name(name), m_var_name(var_name), m_read_start(read_start), m_read_end(read_end),
+		m_write_start(write_start), m_write_end(write_end), m_handle(0), m_dirty(false)
 {
 	if(read_end<read_start || write_end<write_start)
 	{
@@ -94,7 +95,7 @@ AdsBlock::AdsBlock(int id, const std::string& name, const std::string& var_name,
 	}
 	convert_address(ip, port);
 	unsigned long block_size = (m_read_end - m_read_start) + (m_write_end - m_write_start);
-	m_comm_buf.resize(block_size, 0);
+	m_comm_buf.reset(new unsigned char[block_size]);
 }
 
 AdsBlock::~AdsBlock()
@@ -124,29 +125,48 @@ void AdsBlock::Initialize()
 
 void AdsBlock::Terminate()
 {
-
 }
 
 void AdsBlock::Sync()
 {
-	unsigned long block_size = (m_read_end - m_read_start) + (m_write_end - m_write_start);
-	long rtv = AdsSyncReadReq(&m_addr, ADSIGRP_SYM_VALBYHND, m_handle, block_size, &(*(m_comm_buf.begin())));
-	if(rtv)
+	unsigned read_size = m_read_end - m_read_start;
+	unsigned write_size = m_write_end - m_write_start;
+	unsigned block_size = read_size + write_size;
+	if(read_size > 0)
 	{
-		//write log
+		long rtv = AdsSyncReadReq(&m_addr, ADSIGRP_SYM_VALBYHND, m_handle, block_size, &m_comm_buf[0]);
+		if(rtv)
+		{
+			//write log
+		}
 	}
 
+	bool write_flag = false;
 	{
-		boost::mutex::scoped_lock lock(m_mtx);
-		std::copy(m_comm_buf.begin()+m_read_start, m_comm_buf.begin()+m_read_end, m_buffer+m_read_start);
-		std::copy(m_buffer+m_write_start, m_buffer+m_write_end, m_comm_buf.begin()+m_write_start);
+		boost::recursive_mutex::scoped_lock lock(m_mtx);
+		if(read_size > 0)
+		{
+			std::copy(&m_comm_buf[m_read_start], &m_comm_buf[m_read_end],
+					m_buffer+m_read_start);
+		}
+		if(write_size > 0 && m_dirty)
+		{
+			std::copy(m_buffer+m_write_start, m_buffer+m_write_end, &m_comm_buf[m_write_start]);
+			write_flag = true;
+			m_dirty = false;
+		}
 	}
 
-	long rtv = AdsSyncWriteReq(&m_addr, ADSIGRP_SYM_VALBYHND, m_handle, block_size, &(*(m_comm_buf.begin())));
-	if(rtv)
+	if(write_flag)
 	{
-		//write log
+		long rtv = AdsSyncWriteReq(&m_addr, ADSIGRP_SYM_VALBYHND, m_handle, block_size,	&m_comm_buf[0]);
+		if(rtv)
+		{
+			//write log
+		}
 	}
+
+	Block::Sync();
 }
 
 void AdsBlock::Write(unsigned long long value, unsigned byte_offset,
@@ -157,11 +177,12 @@ void AdsBlock::Write(unsigned long long value, unsigned byte_offset,
 	value &= mask;
 	{
 		unsigned long long rtv;
-		boost::mutex::scoped_lock lock(m_mtx);
-		memcpy_s(&rtv, m_buffer+byte_offset, sizeof(unsigned long long));
+		boost::recursive_mutex::scoped_lock lock(m_mtx);
+		memcpy(&rtv, m_buffer+byte_offset, sizeof(unsigned long long));
 		rtv &= ~mask;
 		rtv |= value;
-		memcpy_s(m_buffer+byte_offset, &rtv, sizeof(unsigned long long));
+		memcpy(m_buffer+byte_offset, &rtv, sizeof(unsigned long long));
+		m_dirty = true;
 	}
 }
 
@@ -170,8 +191,8 @@ unsigned long long AdsBlock::Read(unsigned byte_offset, unsigned bit_offset,
 {
 	unsigned long long rtv;
 	{
-		boost::mutex::scoped_lock lock(m_mtx);
-		memcpy_s(&rtv, m_buffer+byte_offset, sizeof(unsigned long long));
+		boost::recursive_mutex::scoped_lock lock(m_mtx);
+		memcpy(&rtv, m_buffer+byte_offset, sizeof(unsigned long long));
 	}
 
 	rtv >>= bit_offset;
@@ -190,7 +211,7 @@ void AdsBlock::convert_address(const std::string& ip, unsigned short port)
 		int i=0;
 		for (auto itor = mat.begin(); itor != mat.end(); ++itor)
 		{
-			m_addr.netId[i++] = boost::lexical_cast<unsigned short>(*itor);
+			m_addr.netId.b[i++] = boost::lexical_cast<unsigned short>(*itor);
 		}
 		m_addr.port = port;
 	}

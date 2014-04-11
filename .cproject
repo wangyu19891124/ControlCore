@@ -62,7 +62,9 @@
 									<listOptionValue builtIn="false" value="boost_filesystem-mgw48-mt-1_55"/>
 									<listOptionValue builtIn="false" value="boost_log-mgw48-mt-1_55"/>
 									<listOptionValue builtIn="false" value="boost_log_setup-mgw48-mt-1_55"/>
+									<listOptionValue builtIn="false" value="boost_regex-mgw48-mt-1_55"/>
 									<listOptionValue builtIn="false" value="mysql"/>
+									<listOptionValue builtIn="false" value="TcAdsDll"/>
 								</option>
 								<option id="gnu.cpp.link.option.paths.1445765383" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="&quot;D:\MinGW\lib&quot;"/>

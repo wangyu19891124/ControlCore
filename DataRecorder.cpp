@@ -95,6 +95,7 @@ void DataRecorder::Terminate()
 
 	m_thrd->interrupt();
 	m_thrd->join();
+	m_thrd.reset(nullptr);
 
 	m_items.clear();
 }

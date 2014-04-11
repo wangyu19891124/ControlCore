@@ -8,41 +8,91 @@
 
 #include "Device.h"
 
-const unsigned int MAX_BLOCK_IO_NUM = 1024;
 
 bool Device::IsSimulator()
 {
 	return false;
 }
 
+void Device::Initialize()
+{
+	for(auto& x : m_blocks)
+	{
+		x.second->Initialize();
+	}
+
+	if(!m_thrd)
+		m_thrd.reset(new boost::thread([this](){this->sync();}));
+}
+
+void Device::Terminate()
+{
+	if(m_thrd)
+	{
+		m_thrd->interrupt();
+		m_thrd->join();
+		m_thrd.reset(nullptr);
+	}
+
+	for(auto& x : m_blocks)
+	{
+		x.second->Terminate();
+	}
+
+	m_blocks.clear();
+}
+
+void Device::sync()
+{
+	boost::this_thread::disable_interruption di;
+
+	using namespace boost::posix_time;
+	auto t = microsec_clock::universal_time();
+
+	while(true)
+	{
+		t += milliseconds(50);
+		{
+			for(auto& x : m_blocks)
+			{
+				x.second->Sync();
+			}
+		}
+
+		if (boost::this_thread::interruption_requested())
+			break;
+
+		boost::this_thread::sleep(t);
+	}
+}
+
+void Device::Write(unsigned long long value, unsigned block, unsigned byte_offset, unsigned bit_offset, unsigned bits)
+{
+	m_blocks[block]->Write(value, byte_offset, bit_offset, bits);
+}
+
+unsigned long long Device::Read(unsigned block, unsigned byte_offset, unsigned bit_offset, unsigned bits)
+{
+	return m_blocks[block]->Read(byte_offset, bit_offset, bits);
+}
+
+void Device::Write(int id, float value)
+{
+
+}
+
+float Device::Read(int id)
+{
+	return .0f;
+}
+
+
 unsigned int Device::Follow(unsigned block, boost::function<void ()> f)
 {
-	boost::recursive_mutex::scoped_lock lock(m_mtx);
-	unsigned token = block * MAX_BLOCK_IO_NUM + m_follower[block].size();
-	m_follower[block].push_back(f);
-	return token;
+	return m_blocks[block]->Follow(f);
 }
 
-void Device::Unfollow(unsigned token)
+void Device::Unfollow(unsigned block, unsigned token)
 {
-	boost::recursive_mutex::scoped_lock lock(m_mtx);
-
-	unsigned block = token/MAX_BLOCK_IO_NUM;
-	unsigned index = token%MAX_BLOCK_IO_NUM;
-	if(index >= m_follower[block].size())
-		return;
-
-	m_follower[block][index].clear();
-}
-
-void Device::Notify(unsigned block)
-{
-	boost::recursive_mutex::scoped_lock lock(m_mtx);
-	std::vector<boost::function<void ()>>& notify_list = m_follower[block];
-
-	for(auto& f : notify_list)
-	{
-		if(f)
-			f();
-	}
+	m_blocks[block]->Unfollow(token);
 }

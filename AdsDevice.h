@@ -23,15 +23,6 @@ public:
 	virtual std::string GetName();
 	virtual void Initialize();
 	virtual void Terminate();
-	//for real device
-	virtual void Write(unsigned value, unsigned block, unsigned io_offset, unsigned bit_offset, unsigned bits);
-	virtual unsigned Read(unsigned block, unsigned io_offset, unsigned bit_offset, unsigned bits);
-	//for simulator
-	virtual void Write(int id, float value);
-	virtual float Read(int id);
-
-private:
-	std::map<int, boost::shared_ptr<AdsBlock>> m_blocks;
 };
 
 #endif /* ADSDEVICE_H_ */

@@ -9,10 +9,12 @@
 #define DEVICE_H_
 
 #include <map>
-#include <vector>
 
-#include "boost/function.hpp"
-#include "boost/thread/recursive_mutex.hpp"
+#include "boost/thread.hpp"
+#include "boost/shared_ptr.hpp"
+#include "boost/scoped_ptr.hpp"
+
+#include "Block.h"
 
 class Device
 {
@@ -23,25 +25,28 @@ public:
 	virtual bool IsSimulator();
 
 	virtual std::string GetName() = 0;
-	virtual void Initialize() = 0;
-	virtual void Terminate() = 0;
+	virtual void Initialize();
+	virtual void Terminate();
+
 	//for real device
-	virtual void Write(unsigned value, unsigned block, unsigned io_offset, unsigned bit_offset, unsigned bits) = 0;
-	virtual unsigned Read(unsigned block, unsigned io_offset, unsigned bit_offset, unsigned bits) = 0;
+	virtual void Write(unsigned long long value, unsigned block, unsigned byte_offset,
+			unsigned bit_offset, unsigned bits);
+	virtual unsigned long long Read(unsigned block, unsigned byte_offset, unsigned bit_offset, unsigned bits);
+
 	//for simulator
-	virtual void Write(int id, float value) = 0;
-	virtual float Read(int id) = 0;
+	virtual void Write(int id, float value);
+	virtual float Read(int id);
 
 	unsigned int Follow(unsigned block, boost::function<void ()> f);
-	void Unfollow(unsigned token);
-
-protected:
-	void Notify(unsigned block);
+	void Unfollow(unsigned block, unsigned token);
 
 private:
-	std::map<unsigned, std::vector<boost::function<void ()> > > m_follower;
-	boost::recursive_mutex m_mtx;
+	void sync();
+
+protected:
+	std::map<unsigned, boost::shared_ptr<Block>> m_blocks;
 	int m_dev_id;
+	boost::scoped_ptr<boost::thread> m_thrd;
 };
 
 #endif /* DEVICE_H_ */

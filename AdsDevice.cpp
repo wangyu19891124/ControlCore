@@ -6,47 +6,50 @@
  */
 
 #include "boost/regex.hpp"
+#include "boost/property_tree/ptree.hpp"
+#include "boost/property_tree/json_parser.hpp"
+#include "boost/make_shared.hpp"
 
 #include "AdsDevice.h"
+#include "AdsBlock.h"
 
 void AdsDevice::Initialize()
 {
-	ConfigFile cfg("ads");
-	std::string ams_net_id = cfg.Read<std::string>("AmsNetID", "192.168.3.100.1.1");
-	std::string heater_net_id = cfg.Read<std::string>("HeaterNetID", "192.168.3.100.1.1");
+	AdsPortOpen();
 
-	ams_addr_from_string(m_ams_addr, ams_net_id);
+	using namespace boost::property_tree;
+	ptree pt;
+	json_parser::read_json("./config/ads.json", pt);
+
+	std::string name, var, net_id;
+	unsigned id;
+	unsigned short port, read_start, read_end, write_start, write_end;
+	for(auto &v : pt.get_child("Blocks"))
+	{
+		id = v.second.get<unsigned>("ID");
+		name = v.second.get<std::string>("Name");
+		var = v.second.get<std::string>("Variable");
+		net_id = v.second.get<std::string>("NetID");
+		port = v.second.get<unsigned short>("Port");
+		read_start = v.second.get<unsigned short>("ReadStart");
+		read_end = v.second.get<unsigned short>("ReadEnd");
+		write_start = v.second.get<unsigned short>("WriteStart");
+		write_end = v.second.get<unsigned short>("WriteEnd");
+		m_blocks[id] = boost::make_shared<AdsBlock>(id, name, var, net_id, port, read_start,
+				read_end, write_start, write_end);
+	}
+
+	Device::Initialize();
 }
 
 void AdsDevice::Terminate()
 {
+	Device::Terminate();
 
+	AdsPortClose();
 }
 
 std::string AdsDevice::GetName()
 {
 	return "Ads";
-}
-
-//for real device
-void AdsDevice::Write(unsigned value, unsigned block, unsigned io_offset,
-		unsigned bit_offset, unsigned bits)
-{
-
-}
-
-unsigned AdsDevice::Read(unsigned block, unsigned io_offset, unsigned bit_offset, unsigned bits)
-{
-	return 0;
-}
-
-//for simulator
-void AdsDevice::Write(int id, float value)
-{
-
-}
-
-float AdsDevice::Read(int id)
-{
-	return 0.0f;
 }

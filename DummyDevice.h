@@ -20,11 +20,8 @@ public:
 	virtual void Initialize();
 	virtual void Terminate();
 	//for real device
-	virtual void Write(unsigned value, unsigned block, unsigned io_offset, unsigned bit_offset, unsigned bits);
-	virtual unsigned Read(unsigned block, unsigned io_offset, unsigned bit_offset, unsigned bits);
-	//for simulator
-	virtual void Write(int id, float value);
-	virtual float Read(int id);
+	virtual void Write(unsigned long long value, unsigned block, unsigned byte_offset, unsigned bit_offset, unsigned bits);
+	virtual unsigned long long Read(unsigned block, unsigned byte_offset, unsigned bit_offset, unsigned bits);
 };
 
 #endif /* DUMMYDEVICE_H_ */

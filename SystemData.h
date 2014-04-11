@@ -34,7 +34,7 @@ T1 MemeryDataConvert(T2 data)
 	static_assert(sizeof(T1) == sizeof(T2), "The size of T1 and T2 are different in MemeryDataConvert.");
 
 	T1 t;
-	memcpy_s(&t, &data, sizeof(T1));
+	memcpy(&t, &data, sizeof(T1));
 	return t;
 }
 
@@ -169,7 +169,7 @@ public:
 		else
 		{
 			boost::shared_ptr<Device> dev_ptr = DeviceManager::Instance().GetDevice(m_id);
-			dev_ptr->Unfollow(m_token);
+			dev_ptr->Unfollow(m_block, m_token);
 		}
 	}
 
