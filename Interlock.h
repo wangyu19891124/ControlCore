@@ -22,6 +22,7 @@ public:
 	void Initialize();
 	void Terminate();
 
+	friend class SingletonT<Interlock>;
 };
 
 #endif /* INTERLOCK_H_ */

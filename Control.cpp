@@ -8,6 +8,7 @@
 #include "LogFile.h"
 #include "Database.h"
 #include "SystemParameter.h"
+#include "Interlock.h"
 
 extern "C" void Initialize()
 {
@@ -17,12 +18,14 @@ extern "C" void Initialize()
 	Worker::Instance().Initialize();
 	DeviceManager::Instance().Initialize();
 	SystemDataPool::Instance().Initialize();
+	Interlock::Instance().Initialize();
 	WaferManager::Instance().Initialize();
 }
 
 extern "C" void Terminate()
 {
 	WaferManager::Instance().Terminate();
+	Interlock::Instance().Terminate();
 	SystemDataPool::Instance().Terminate();
 	DeviceManager::Instance().Terminate();
 	Worker::Instance().Terminate();
