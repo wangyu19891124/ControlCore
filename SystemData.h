@@ -75,12 +75,12 @@ class SystemData : public BaseSystemData
 {
 public:
 	SystemData(int id, const std::string& name, const std::string& path, T min, T max, int precision, int device,
-			unsigned int block, unsigned int io_offset, unsigned short bit_offset,
+			unsigned int block, unsigned int byte_offset, unsigned short bit_offset,
 			unsigned short bits, bool writable, const std::string& unit = "",
 			boost::function<T (unsigned int)> raw_to_real = DefaultDataConvert<unsigned int>,
 			boost::function<unsigned int (T)> real_to_raw = DefaultDataConvert<unsigned int>)
 	: BaseSystemData(id, name, path), m_unit(unit), m_min(min), m_max(max), m_precision(precision), m_device(device),
-	  m_block(block), m_io_offset(io_offset), m_bit_offset(bit_offset), m_bits(bits), m_writable(writable), m_data(T()),
+	  m_block(block), m_byte_offset(byte_offset), m_bit_offset(bit_offset), m_bits(bits), m_writable(writable), m_data(T()),
 	  m_token(0), m_raw_to_real(raw_to_real), m_real_to_raw(real_to_raw){};
 
 	SystemData(int id, const std::string& name, const std::string& path, T min, T max, int precision =0, const std::string& unit = "")
@@ -151,10 +151,10 @@ public:
 			return;
 
 		boost::shared_ptr<Device> dev_ptr = DeviceManager::Instance().GetDevice(m_id);
-		m_get_func = boost::bind(&Device::Read, dev_ptr, m_block, m_io_offset, m_bit_offset, m_bits);
+		m_get_func = boost::bind(&Device::Read, dev_ptr, m_block, m_byte_offset, m_bit_offset, m_bits);
 		ReadData();
 		if(m_writable)
-			m_put_func = boost::bind(&Device::Write, dev_ptr, _1, m_block, m_io_offset, m_bit_offset, m_bits);
+			m_put_func = boost::bind(&Device::Write, dev_ptr, _1, m_block, m_byte_offset, m_bit_offset, m_bits);
 		else
 			m_token = dev_ptr->Follow(m_block, boost::bind(&SystemData<T>::ReadData, this));
 	}
@@ -248,7 +248,7 @@ private:
 	int m_precision;
 	int m_device;
 	unsigned int m_block;
-	unsigned int m_io_offset;
+	unsigned int m_byte_offset;
 	unsigned short m_bit_offset;
 	unsigned short m_bits;
 	bool m_writable;

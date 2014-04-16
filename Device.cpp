@@ -66,12 +66,12 @@ void Device::sync()
 	}
 }
 
-void Device::Write(unsigned long long value, unsigned block, unsigned byte_offset, unsigned bit_offset, unsigned bits)
+void Device::Write(unsigned int value, unsigned block, unsigned byte_offset, unsigned bit_offset, unsigned bits)
 {
 	m_blocks[block]->Write(value, byte_offset, bit_offset, bits);
 }
 
-unsigned long long Device::Read(unsigned block, unsigned byte_offset, unsigned bit_offset, unsigned bits)
+unsigned int Device::Read(unsigned block, unsigned byte_offset, unsigned bit_offset, unsigned bits)
 {
 	return m_blocks[block]->Read(byte_offset, bit_offset, bits);
 }

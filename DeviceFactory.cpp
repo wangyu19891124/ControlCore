@@ -16,6 +16,10 @@ boost::shared_ptr<Device> DeviceFactory::CreateDevice(int id, const std::string&
 	{
 		return boost::shared_ptr<Device>(new DummyDevice(id));
 	}
+	else if(boost::algorithm::iequals(name, "Ads"))
+	{
+		return boost::shared_ptr<Device>(new AdsDevice(id));
+	}
 
 	return boost::shared_ptr<Device>(nullptr);
 }

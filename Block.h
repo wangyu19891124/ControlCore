@@ -22,8 +22,8 @@ public:
 	virtual void Initialize() = 0;
 	virtual void Terminate() = 0;
 	virtual void Sync();
-	virtual void Write(unsigned long long value, unsigned byte_offset, unsigned bit_offset, unsigned bits) = 0;
-	virtual unsigned long long Read(unsigned byte_offset, unsigned bit_offset, unsigned bits) = 0;
+	virtual void Write(unsigned int value, unsigned byte_offset, unsigned bit_offset, unsigned bits) = 0;
+	virtual unsigned int Read(unsigned byte_offset, unsigned bit_offset, unsigned bits) = 0;
 	virtual unsigned int Follow(boost::function<void ()> f);
 	virtual void Unfollow(unsigned token);
 

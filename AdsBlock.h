@@ -27,8 +27,8 @@ public:
 	virtual void Initialize();
 	virtual void Terminate();
 	virtual void Sync();
-	virtual void Write(unsigned long long value, unsigned byte_offset, unsigned bit_offset, unsigned bits);
-	virtual unsigned long long Read(unsigned byte_offset, unsigned bit_offset, unsigned bits);
+	virtual void Write(unsigned int value, unsigned byte_offset, unsigned bit_offset, unsigned bits);
+	virtual unsigned int Read(unsigned byte_offset, unsigned bit_offset, unsigned bits);
 
 private:
 	void convert_address(const std::string& str, unsigned short port);

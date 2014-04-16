@@ -21,13 +21,13 @@ std::string DummyDevice::GetName()
 }
 
 //for real device
-void DummyDevice::Write(unsigned long long value, unsigned block, unsigned io_offset,
+void DummyDevice::Write(unsigned int value, unsigned block, unsigned io_offset,
 		unsigned bit_offset, unsigned bits)
 {
 
 }
 
-unsigned long long DummyDevice::Read(unsigned block, unsigned io_offset, unsigned bit_offset, unsigned bits)
+unsigned int DummyDevice::Read(unsigned block, unsigned io_offset, unsigned bit_offset, unsigned bits)
 {
 	return 0;
 }

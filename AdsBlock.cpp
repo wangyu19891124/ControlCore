@@ -13,7 +13,7 @@
 
 #include "AdsBlock.h"
 
-static unsigned long long bits_mask[64] =
+static unsigned int bits_mask[32] =
 {
 		0x1,
 		0x3,
@@ -46,39 +46,7 @@ static unsigned long long bits_mask[64] =
 		0x1FFFFFFF,
 		0x3FFFFFFF,
 		0x7FFFFFFF,
-		0xFFFFFFFF,
-		0x1FFFFFFFF,
-		0x3FFFFFFFF,
-		0x7FFFFFFFF,
-		0xFFFFFFFFF,
-		0x1FFFFFFFFF,
-		0x3FFFFFFFFF,
-		0x7FFFFFFFFF,
-		0xFFFFFFFFFF,
-		0x1FFFFFFFFFF,
-		0x3FFFFFFFFFF,
-		0x7FFFFFFFFFF,
-		0xFFFFFFFFFFF,
-		0x1FFFFFFFFFFF,
-		0x3FFFFFFFFFFF,
-		0x7FFFFFFFFFFF,
-		0xFFFFFFFFFFFF,
-		0x1FFFFFFFFFFFF,
-		0x3FFFFFFFFFFFF,
-		0x7FFFFFFFFFFFF,
-		0xFFFFFFFFFFFFF,
-		0x1FFFFFFFFFFFFF,
-		0x3FFFFFFFFFFFFF,
-		0x7FFFFFFFFFFFFF,
-		0xFFFFFFFFFFFFFF,
-		0x1FFFFFFFFFFFFFF,
-		0x3FFFFFFFFFFFFFF,
-		0x7FFFFFFFFFFFFFF,
-		0xFFFFFFFFFFFFFFF,
-		0x1FFFFFFFFFFFFFFF,
-		0x3FFFFFFFFFFFFFFF,
-		0x7FFFFFFFFFFFFFFF,
-		0xFFFFFFFFFFFFFFFF
+		0xFFFFFFFF
 };
 
 AdsBlock::AdsBlock(unsigned id, const std::string& name, const std::string& var_name, const std::string& ip,
@@ -169,30 +137,30 @@ void AdsBlock::Sync()
 	Block::Sync();
 }
 
-void AdsBlock::Write(unsigned long long value, unsigned byte_offset,
+void AdsBlock::Write(unsigned int value, unsigned byte_offset,
 		unsigned bit_offset, unsigned bits)
 {
-	unsigned long long mask = (bits_mask[bits-1]<<bit_offset);
+	unsigned int mask = (bits_mask[bits-1]<<bit_offset);
 	value <<= bit_offset;
 	value &= mask;
 	{
-		unsigned long long rtv;
+		unsigned int rtv;
 		boost::recursive_mutex::scoped_lock lock(m_mtx);
-		memcpy(&rtv, m_buffer+byte_offset, sizeof(unsigned long long));
+		memcpy(&rtv, m_buffer+byte_offset, sizeof(unsigned int));
 		rtv &= ~mask;
 		rtv |= value;
-		memcpy(m_buffer+byte_offset, &rtv, sizeof(unsigned long long));
+		memcpy(m_buffer+byte_offset, &rtv, sizeof(unsigned int));
 		m_dirty = true;
 	}
 }
 
-unsigned long long AdsBlock::Read(unsigned byte_offset, unsigned bit_offset,
+unsigned int AdsBlock::Read(unsigned byte_offset, unsigned bit_offset,
 		unsigned bits)
 {
-	unsigned long long rtv;
+	unsigned int rtv;
 	{
 		boost::recursive_mutex::scoped_lock lock(m_mtx);
-		memcpy(&rtv, m_buffer+byte_offset, sizeof(unsigned long long));
+		memcpy(&rtv, m_buffer+byte_offset, sizeof(unsigned int));
 	}
 
 	rtv >>= bit_offset;

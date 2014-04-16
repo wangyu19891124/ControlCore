@@ -29,9 +29,9 @@ public:
 	virtual void Terminate();
 
 	//for real device
-	virtual void Write(unsigned long long value, unsigned block, unsigned byte_offset,
+	virtual void Write(unsigned int value, unsigned block, unsigned byte_offset,
 			unsigned bit_offset, unsigned bits);
-	virtual unsigned long long Read(unsigned block, unsigned byte_offset, unsigned bit_offset, unsigned bits);
+	virtual unsigned int Read(unsigned block, unsigned byte_offset, unsigned bit_offset, unsigned bits);
 
 	//for simulator
 	virtual void Write(int id, float value);
