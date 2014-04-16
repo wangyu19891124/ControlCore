@@ -39,6 +39,20 @@ void Log(boost::log::trivial::severity_level level, const std::string& msg)
 	LogFile::Instance().Write(level, msg);
 }
 
+void LogEvent(int evt_id, EventLevel level, const std::string& msg)
+{
+	std::stringstream ss;
+	ss<<"[["<<evt_id<<"]] "<<msg;
+
+	if(level == EVENT_LEVEL_INFO)
+		Log(trivial::info, ss.str());
+	else if(level == EVENT_LEVEL_WARNING)
+		Log(trivial::warning, ss.str());
+	else if(level == EVENT_LEVEL_ERROR)
+		Log(trivial::error, ss.str());
+	else
+		Log(trivial::fatal, ss.str());
+}
 void LogTrace(const std::string& msg)
 {
 	Log(trivial::trace, msg);

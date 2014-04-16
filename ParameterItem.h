@@ -23,6 +23,8 @@ public:
 	ParameterItemBase& operator = (const ParameterItemBase&) = delete;
 
 	bool IsChild(const std::string& path);
+	bool IsInRange(int from, int to);
+	bool IsInSet(const std::set<int>& id_set);
 
 	virtual void Serialize(boost::property_tree::ptree& pt) = 0;
 

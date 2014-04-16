@@ -37,9 +37,12 @@ void EventLogger::Log(unsigned int evt_id, EventLevel evt_level, const std::stri
 	if (evt_level & m_filter)
 	{
 		Database::Instance().Log(evt_id, event_level_to_string(evt_level), info);
+		LogEvent(evt_id, evt_level, info);
 		LogItem item(local_time_string(), evt_id, evt_level, info);
 		boost::mutex::scoped_lock lock(m_mtx);
 		m_logs.push_back(item);
+		if(m_logs.size()>100)
+			m_logs.pop_front();
 	}
 }
 

@@ -46,7 +46,7 @@ public:
 		return T();
 	}
 
-	std::string GetJsonData(const std::string& path)
+	std::string GetJsonData(boost::function<bool (ParameterItemBase*)> f)
 	{
 		using namespace boost::property_tree;
 		ptree array;
@@ -54,7 +54,7 @@ public:
 		for(auto &v : m_cfgs)
 		{
 			item_ptr = v.second;
-			if(item_ptr->IsChild(path))
+			if(f && f(item_ptr))
 			{
 				item_ptr->Serialize(array);
 			}
