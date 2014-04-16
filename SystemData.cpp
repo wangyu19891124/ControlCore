@@ -29,3 +29,14 @@ bool BaseSystemData::HasChanged()
 {
 	return m_changed_flag;
 }
+
+bool BaseSystemData::IsInRange(int from, int to)
+{
+	return m_id>=from && m_id<=to;
+}
+
+bool BaseSystemData::IsInSet(const std::set<int>& id_set)
+{
+	return id_set.find(m_id) != id_set.end();
+}
+

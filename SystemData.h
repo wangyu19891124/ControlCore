@@ -62,6 +62,8 @@ public:
 	}
 	bool HasChanged();
 	bool IsChild(const std::string& path);
+	bool IsInRange(int from, int to);
+	bool IsInSet(const std::set<int>& id_set);
 
 protected:
 	int m_id;

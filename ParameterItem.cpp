@@ -22,4 +22,14 @@ bool ParameterItemBase::IsChild(const std::string& path)
 	return boost::algorithm::equals(m_path, path);
 }
 
+bool ParameterItemBase::IsInRange(int from, int to)
+{
+	return m_id>=from && m_id<=to;
+}
+
+bool ParameterItemBase::IsInSet(const std::set<int>& id_set)
+{
+	return id_set.find(m_id) != id_set.end();
+}
+
 

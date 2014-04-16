@@ -8,6 +8,8 @@
 #ifndef PARAMETERITEM_H_
 #define PARAMETERITEM_H_
 
+#include <set>
+
 #include "boost/property_tree/ptree.hpp"
 
 #include "ParameterHolder.h"

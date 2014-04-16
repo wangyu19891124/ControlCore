@@ -9,6 +9,7 @@
 
 #include "DeviceFactory.h"
 #include "DummyDevice.h"
+#include "AdsDevice.h"
 
 boost::shared_ptr<Device> DeviceFactory::CreateDevice(int id, const std::string& name)
 {

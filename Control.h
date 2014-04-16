@@ -20,7 +20,7 @@ void FetchParametersByPath(const char* path, char** json);
 
 void FetchSystemDataByIDRange(int from, int to, bool only_changed, char** json);
 void FetchSystemDataByIDs(int* id_array, unsigned num, bool only_changed, char** json);
-void FetchParametersByPath(const char* path, bool only_changed, char** json);
+void FetchSystemDataByPath(const char* path, bool only_changed, char** json);
 
 void FetchRecentEventLog(char** json);
 

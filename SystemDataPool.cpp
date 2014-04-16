@@ -180,7 +180,7 @@ void SystemDataPool::Terminate()
 	m_all_data.clear();
 }
 
-std::string SystemDataPool::ToJson(boost::function<bool (BaseSystemData*)> f)
+std::string SystemDataPool::GetJsonData(boost::function<bool (BaseSystemData*)> f)
 {
 	using namespace boost::property_tree;
 	ptree array;

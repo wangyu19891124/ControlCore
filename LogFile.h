@@ -47,6 +47,6 @@ void LogInfo(const std::string& msg);
 void LogWarning(const std::string& msg);
 void LogError(const std::string& msg);
 void LogFatal(const std::string& msg);
-void LogEvent(int evt_id, boost::log::trivial::severity_level level, const std::string& msg);
+void LogEvent(int evt_id, EventLevel level, const std::string& msg);
 
 #endif /* LOGFILE_H_ */

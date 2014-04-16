@@ -13,7 +13,7 @@
 #include "Database.h"
 #include "Utility.h"
 #include "EventLog.h"
-
+#include "LogFile.h"
 
 EventLogger::EventLogger() : m_filter(0xFF)
 {
