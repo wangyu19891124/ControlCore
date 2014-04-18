@@ -9,6 +9,7 @@
 #define SYSTEMDATA_H_
 
 #include <string>
+#include <sstream>
 #include <typeinfo>
 
 #include "boost/property_tree/ptree.hpp"
@@ -17,6 +18,7 @@
 
 #include "DeviceManager.h"
 #include "Worker.h"
+#include "LogFile.h"
 
 const int NoRelatedDevice = -1;
 
@@ -52,7 +54,7 @@ public:
 	virtual ~BaseSystemData();
 
 	virtual void Serialize(boost::property_tree::ptree& pt) = 0;
-	virtual const std::type_info& GetType() = 0;
+	virtual const std::type_info& Type() = 0;
 	virtual void Initialize() = 0;
 	virtual void Terminate() = 0;
 
@@ -142,23 +144,32 @@ public:
 		pt.push_back(make_pair("", node));
 	}
 
-	virtual const std::type_info& GetType()
+	virtual const std::type_info& Type()
 	{
 		return typeid(T);
 	}
 
 	virtual void Initialize()
 	{
-		if(m_id == NoRelatedDevice)
+		if(m_device == NoRelatedDevice)
 			return;
 
-		boost::shared_ptr<Device> dev_ptr = DeviceManager::Instance().GetDevice(m_id);
-		m_get_func = boost::bind(&Device::Read, dev_ptr, m_block, m_byte_offset, m_bit_offset, m_bits);
-		ReadData();
-		if(m_writable)
-			m_put_func = boost::bind(&Device::Write, dev_ptr, _1, m_block, m_byte_offset, m_bit_offset, m_bits);
+		boost::shared_ptr<Device> dev_ptr = DeviceManager::Instance().GetDevice(m_device);
+		if(dev_ptr)
+		{
+			m_get_func = [dev_ptr, this](){return dev_ptr->Read(m_block, m_byte_offset, m_bit_offset, m_bits);};
+			ReadData();
+			if(m_writable)
+				m_put_func = [dev_ptr, this](unsigned value){dev_ptr->Write(value, m_block, m_byte_offset, m_bit_offset, m_bits);};
+			else
+				m_token = dev_ptr->Follow(m_block, [this](){ReadData();});
+		}
 		else
-			m_token = dev_ptr->Follow(m_block, boost::bind(&SystemData<T>::ReadData, this));
+		{
+			std::stringstream ss;
+			ss<<"No device related with system data[id="<<m_id<<", name="<<m_name<<", device="<<m_device<<"].";
+			LogDebug(ss.str());
+		}
 	}
 
 	virtual void Terminate()
@@ -170,7 +181,7 @@ public:
 			m_put_func.clear();
 		else
 		{
-			boost::shared_ptr<Device> dev_ptr = DeviceManager::Instance().GetDevice(m_id);
+			boost::shared_ptr<Device> dev_ptr = DeviceManager::Instance().GetDevice(m_device);
 			dev_ptr->Unfollow(m_block, m_token);
 		}
 	}
@@ -239,7 +250,7 @@ private:
 		for(boost::function<void (T)>& f : m_update_sinks)
 		{
 			if(f)
-				Worker::Instance().Post(boost::bind(f, m_data));
+				Worker::Instance().Post([this, f](){f(this->m_data);});
 		}
 	}
 
@@ -306,7 +317,7 @@ public:
 		pt.add_child("SystemData.Data", node);
 	}
 
-	virtual const std::type_info& GetType()
+	virtual const std::type_info& Type()
 	{
 		return typeid(std::string);
 	}

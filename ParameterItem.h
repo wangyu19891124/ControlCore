@@ -9,6 +9,7 @@
 #define PARAMETERITEM_H_
 
 #include <set>
+#include <typeinfo>
 
 #include "boost/property_tree/ptree.hpp"
 
@@ -29,6 +30,7 @@ public:
 	bool IsInSet(const std::set<int>& id_set);
 
 	virtual void Serialize(boost::property_tree::ptree& pt) = 0;
+	virtual const std::type_info& Type() = 0;
 
 protected:
 	int m_id;
@@ -84,6 +86,11 @@ public:
 		pt.push_back(make_pair("", node));
 	}
 
+	virtual const std::type_info& Type()
+	{
+		return typeid(T);
+	}
+
 private:
 	T m_min;
 	T m_max;
@@ -132,6 +139,11 @@ public:
 		node.add<int>("id", m_id);
 		node.add("value", m_value);
 		pt.push_back(make_pair("", node));
+	}
+
+	virtual const std::type_info& Type()
+	{
+		return typeid(std::string);
 	}
 
 private:

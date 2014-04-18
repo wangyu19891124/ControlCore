@@ -22,6 +22,9 @@ public:
 	//for real device
 	virtual void Write(unsigned int value, unsigned block, unsigned byte_offset, unsigned bit_offset, unsigned bits);
 	virtual unsigned int Read(unsigned block, unsigned byte_offset, unsigned bit_offset, unsigned bits);
+
+	virtual unsigned int Follow(unsigned block, boost::function<void ()> f);
+	virtual void Unfollow(unsigned block, unsigned token);
 };
 
 #endif /* DUMMYDEVICE_H_ */

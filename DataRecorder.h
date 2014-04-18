@@ -68,6 +68,7 @@ public:
 	void Add(boost::shared_ptr<RecordItem> item);
 	void Remove(RecordItemID id);
 
+	friend class SingletonT<DataRecorder>;
 private:
 	void monitor();
 

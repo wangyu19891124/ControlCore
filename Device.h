@@ -37,8 +37,8 @@ public:
 	virtual void Write(int id, float value);
 	virtual float Read(int id);
 
-	unsigned int Follow(unsigned block, boost::function<void ()> f);
-	void Unfollow(unsigned block, unsigned token);
+	virtual unsigned int Follow(unsigned block, boost::function<void ()> f);
+	virtual void Unfollow(unsigned block, unsigned token);
 
 private:
 	void sync();

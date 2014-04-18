@@ -5,6 +5,8 @@
  *      Author: acm
  */
 
+#include "boost/lexical_cast.hpp"
+
 #include "SystemDataPool.h"
 #include "Data.h"
 
@@ -198,4 +200,40 @@ std::string SystemDataPool::GetJsonData(boost::function<bool (BaseSystemData*)> 
 	json_parser::write_json(ss, pt);
 
 	return ss.str();
+}
+
+void SystemDataPool::SetData(int id, const std::string& data)
+{
+	BaseSystemData* p = m_all_data[id];
+	if (!p)
+		return;
+
+	try
+	{
+		if (p->Type() == typeid(unsigned))
+		{
+			SystemData<unsigned>* pp =
+					dynamic_cast<SystemData<unsigned>*>(p);
+			*pp = boost::lexical_cast<unsigned>(data);
+		}
+		else if (p->Type() == typeid(int))
+		{
+			SystemData<int>* pp = dynamic_cast<SystemData<int>*>(p);
+			*pp = boost::lexical_cast<unsigned>(data);
+		}
+		else if (p->Type() == typeid(float))
+		{
+			SystemData<float>* pp = dynamic_cast<SystemData<float>*>(p);
+			*pp = boost::lexical_cast<unsigned>(data);
+		}
+		else
+		{
+			SystemData<std::string>* pp = dynamic_cast<SystemData<std::string>*>(p);
+			*pp = data;
+		}
+	}
+	catch (boost::bad_lexical_cast& e)
+	{
+		//report event log of convert error
+	}
 }

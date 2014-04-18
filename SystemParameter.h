@@ -10,8 +10,8 @@
 
 #include "ParameterItem.h"
 
-template<typename T>
-class ParameterItem;
+//template<typename T>
+//class ParameterItem;
 
 class SystemParameter : public SingletonT<SystemParameter>
 {
@@ -23,50 +23,9 @@ protected:
 public:
 	~SystemParameter() = default;
 
-	void Mapping(int id, ParameterItemBase* cfg_ptr)
-	{
-		m_cfgs[id] = cfg_ptr;
-	}
-
-	template<typename T>
-	void SetData(int id, const T& data)
-	{
-		ParameterItem<T>* p = dynamic_cast<ParameterItem<T>*>(m_cfgs[id]);
-		if(p)
-			*p = data;
-	}
-
-	template<typename T>
-	T GetData(int id)
-	{
-		ParameterItem<T>* p = dynamic_cast<ParameterItem<T>*>(m_cfgs[id]);
-		if(p)
-			return (T)(*p);
-
-		return T();
-	}
-
-	std::string GetJsonData(boost::function<bool (ParameterItemBase*)> f)
-	{
-		using namespace boost::property_tree;
-		ptree array;
-		ParameterItemBase* item_ptr = nullptr;
-		for(auto &v : m_cfgs)
-		{
-			item_ptr = v.second;
-			if(f && f(item_ptr))
-			{
-				item_ptr->Serialize(array);
-			}
-		}
-		ptree pt;
-		pt.add_child("parameters", array);
-
-		std::stringstream ss;
-		json_parser::write_json(ss, pt);
-
-		return ss.str();
-	}
+	void Mapping(int id, ParameterItemBase* cfg_ptr);
+	void SetData(int id, const std::string& data);
+	std::string GetJsonData(boost::function<bool (ParameterItemBase*)> f);
 
 	friend class SingletonT<SystemParameter>;
 

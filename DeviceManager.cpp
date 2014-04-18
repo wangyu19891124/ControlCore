@@ -57,6 +57,7 @@ boost::shared_ptr<Device> DeviceManager::GetDevice(int id)
 	{
 		std::stringstream ss;
 		ss<<"Device "<<id<<" doesn't exist.";
+		LogDebug(ss.str());
 		throw ss.str();
 	}
 

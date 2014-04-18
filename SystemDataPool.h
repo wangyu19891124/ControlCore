@@ -23,6 +23,7 @@ public:
 
 	void Initialize();
 	void Terminate();
+	void SetData(int id, const std::string& data);
 	std::string GetJsonData(boost::function<bool (BaseSystemData*)> f);
 
 	friend class SingletonT<SystemDataPool>;
