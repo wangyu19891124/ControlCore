@@ -14,17 +14,17 @@ extern "C"
 void Initialize();
 void Terminate();
 
-int FetchParametersByIDRange(int from, int to, char** json);
-int FetchParametersByIDs(int* id_array, unsigned num, char** json);
-int FetchParametersByPath(const char* path, char** json);
+int FetchParametersByIDRange(int from, int to, char* json, unsigned buffer_size);
+int FetchParametersByIDs(const int* id_array, unsigned num, char* json, unsigned buffer_size);
+int FetchParametersByPath(const char* path, char* json, unsigned buffer_size);
 void ModifyParameter(int id, const char* value);
 
-int FetchSystemDataByIDRange(int from, int to, bool only_changed, char** json);
-int FetchSystemDataByIDs(int* id_array, unsigned num, bool only_changed, char** json);
-int FetchSystemDataByPath(const char* path, bool only_changed, char** json);
+int FetchSystemDataByIDRange(int from, int to, bool only_changed, char* json, unsigned buffer_size);
+int FetchSystemDataByIDs(int* id_array, unsigned num, bool only_changed, char* json, unsigned buffer_size);
+int FetchSystemDataByPath(const char* path, bool only_changed, char* json, unsigned buffer_size);
 void ModifySystemData(int id, const char* value);
 
-int FetchRecentEventLog(char** json);
+int FetchRecentEventLog(char* json, unsigned buffer_size);
 
 void Invoke(int unit, int cmd, unsigned param1, unsigned param2);
 

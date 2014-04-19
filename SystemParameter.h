@@ -23,11 +23,14 @@ protected:
 public:
 	~SystemParameter() = default;
 
-	void Mapping(int id, ParameterItemBase* cfg_ptr);
 	void SetData(int id, const std::string& data);
 	std::string GetJsonData(boost::function<bool (ParameterItemBase*)> f);
 
 	friend class SingletonT<SystemParameter>;
+	friend class ParameterItemBase;
+
+protected:
+	void Mapping(int id, ParameterItemBase* cfg_ptr);
 
 protected:
 	std::map<int, ParameterItemBase*> m_cfgs;

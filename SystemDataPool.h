@@ -11,8 +11,8 @@
 #include "boost/property_tree/ptree.hpp"
 #include "boost/property_tree/json_parser.hpp"
 
-#include "SystemData.h"
 #include "Singleton.h"
+#include "SystemData.h"
 
 class SystemDataPool : public SingletonT<SystemDataPool>
 {
@@ -27,19 +27,25 @@ public:
 	std::string GetJsonData(boost::function<bool (BaseSystemData*)> f);
 
 	friend class SingletonT<SystemDataPool>;
+	friend class BaseSystemData;
 
 private:
-	void InitializeData(BaseSystemData& data)
+	void Mapping(int id, BaseSystemData* data_ptr)
 	{
-		data.Initialize();
-		m_all_data[data.GetID()] = &data;
+		m_all_data[id] = data_ptr;
 	}
 
-	void TerminateData(BaseSystemData& data)
-	{
-		m_all_data[data.GetID()] = nullptr;
-		data.Terminate();
-	}
+//	void InitializeData(BaseSystemData& data)
+//	{
+//		data.Initialize();
+//		m_all_data[data.GetID()] = &data;
+//	}
+//
+//	void TerminateData(BaseSystemData& data)
+//	{
+//		m_all_data[data.GetID()] = nullptr;
+//		data.Terminate();
+//	}
 
 private:
 	std::map<int, BaseSystemData*> m_all_data;

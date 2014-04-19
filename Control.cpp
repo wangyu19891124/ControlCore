@@ -41,24 +41,24 @@ extern "C" void Terminate()
 	LogFile::Instance().Terminate();
 }
 
-int alloc_and_copy_string(char** json, const std::string& json_string)
+int copy_string(char* json, unsigned buffer_size, const std::string& json_string)
 {
-	size_t size = json_string.size()+1;
-	*json = new char[size];
-	std::copy(json_string.begin(), json_string.end(), *json);
-	*(*json+size-1) = 0;
+	size_t string_size = json_string.size();
+	size_t size = std::min(string_size, buffer_size);
+	std::copy(json_string.c_str(), json_string.c_str()+size, json);
 
 	return size;
 }
 
-extern "C" int FetchParametersByIDRange(int from, int to, char** json)
+extern "C" int FetchParametersByIDRange(int from, int to, char* json, unsigned buffer_size)
 {
 	std::string json_string;
 	json_string = SystemParameter::Instance().GetJsonData([from, to](ParameterItemBase* p){return p->IsInRange(from, to);});
-	return alloc_and_copy_string(json, json_string);
+
+	return copy_string(json, buffer_size, json_string);
 }
 
-extern "C" int FetchParametersByIDs(int* id_array, unsigned num, char** json)
+extern "C" int FetchParametersByIDs(const int* id_array, unsigned num, char* json, unsigned buffer_size)
 {
 	std::set<int> id_set;
 	for(unsigned i=0; i<num; i++)
@@ -67,14 +67,14 @@ extern "C" int FetchParametersByIDs(int* id_array, unsigned num, char** json)
 	}
 	std::string json_string;
 	json_string = SystemParameter::Instance().GetJsonData([&id_set](ParameterItemBase* p){return p->IsInSet(id_set);});
-	return alloc_and_copy_string(json, json_string);
+	return copy_string(json, buffer_size, json_string);
 }
 
-extern "C" int FetchParametersByPath(const char* path, char** json)
+extern "C" int FetchParametersByPath(const char* path, char* json, unsigned buffer_size)
 {
 	std::string json_string;
 	json_string = SystemParameter::Instance().GetJsonData([path](ParameterItemBase* p){return p->IsChild(path);});
-	return alloc_and_copy_string(json, json_string);
+	return copy_string(json, buffer_size, json_string);
 }
 
 extern "C" void ModifyParameter(int id, const char* value)
@@ -82,7 +82,7 @@ extern "C" void ModifyParameter(int id, const char* value)
 	SystemParameter::Instance().SetData(id, value);
 }
 
-extern "C" int FetchSystemDataByIDRange(int from, int to, bool only_changed, char** json)
+extern "C" int FetchSystemDataByIDRange(int from, int to, bool only_changed, char* json, unsigned buffer_size)
 {
 	std::string json_string;
 	json_string = SystemDataPool::Instance().GetJsonData(
@@ -91,10 +91,10 @@ extern "C" int FetchSystemDataByIDRange(int from, int to, bool only_changed, cha
 				return p->IsInRange(from, to)
 						&& (!only_changed || (only_changed && p->HasChanged()));
 			});
-	return alloc_and_copy_string(json, json_string);
+	return copy_string(json, buffer_size, json_string);
 }
 
-extern "C" int FetchSystemDataByIDs(int* id_array, unsigned num, bool only_changed, char** json)
+extern "C" int FetchSystemDataByIDs(int* id_array, unsigned num, bool only_changed, char* json, unsigned buffer_size)
 {
 	std::set<int> id_set;
 	for(unsigned i=0; i<num; i++)
@@ -109,10 +109,10 @@ extern "C" int FetchSystemDataByIDs(int* id_array, unsigned num, bool only_chang
 				return p->IsInSet(id_set)
 						&& (!only_changed || (only_changed && p->HasChanged()));
 			});
-	return alloc_and_copy_string(json, json_string);
+	return copy_string(json, buffer_size, json_string);
 }
 
-extern "C" int FetchSystemDataByPath(const char* path, bool only_changed, char** json)
+extern "C" int FetchSystemDataByPath(const char* path, bool only_changed, char* json, unsigned buffer_size)
 {
 	std::string json_string;
 	json_string = SystemDataPool::Instance().GetJsonData(
@@ -121,7 +121,7 @@ extern "C" int FetchSystemDataByPath(const char* path, bool only_changed, char**
 				return p->IsChild(path)
 						&& (!only_changed || (only_changed && p->HasChanged()));
 			});
-	return alloc_and_copy_string(json, json_string);
+	return copy_string(json, buffer_size, json_string);
 }
 
 extern "C" void ModifySystemData(int id, const char* value)
@@ -129,11 +129,11 @@ extern "C" void ModifySystemData(int id, const char* value)
 	SystemDataPool::Instance().SetData(id, value);
 }
 
-extern "C" int FetchRecentEventLog(char** json)
+extern "C" int FetchRecentEventLog(char* json, unsigned buffer_size)
 {
 	std::string json_string;
 	json_string = EventLogger::Instance().FetchLogs();
-	return alloc_and_copy_string(json, json_string);
+	return copy_string(json, buffer_size, json_string);
 }
 
 extern "C" void Invoke(int unit, int cmd, unsigned param1, unsigned param2)
