@@ -10,6 +10,8 @@
 namespace Parameters
 {
 
+
+
 //define all needed parameters here
 //temperature
 ParameterItem<float> VaporizerTC1(1, "VaporizerTC1", "Temperature", "Vaporizer TC1", 0, 200, 20, "¡æ");
