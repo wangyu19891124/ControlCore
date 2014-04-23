@@ -17,11 +17,6 @@ BaseSystemData::BaseSystemData(int id, const std::string& name,
 	SystemDataPool::Instance().Mapping(id, this);
 }
 
-BaseSystemData::~BaseSystemData()
-{
-}
-
-
 bool BaseSystemData::IsChild(const std::string& path)
 {
 	return boost::algorithm::equals(m_path, path);

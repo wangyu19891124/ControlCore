@@ -1,4 +1,5 @@
 #include <fstream>
+#include <sstream>
 
 #include "EventLog.h"
 #include "DeviceManager.h"
@@ -10,6 +11,7 @@
 #include "SystemParameter.h"
 #include "Interlock.h"
 #include "DataRecorder.h"
+#include "RecipeManager.h"
 
 extern "C" void Initialize()
 {
@@ -19,17 +21,15 @@ extern "C" void Initialize()
 	Worker::Instance().Initialize();
 	DeviceManager::Instance().Initialize();
 	SystemDataPool::Instance().Initialize();
-	LogDebug("6");
 	Interlock::Instance().Initialize();
-	LogDebug("7");
 	DataRecorder::Instance().Initialize();
-	LogDebug("8");
 	WaferManager::Instance().Initialize();
-	LogDebug("9");
+	RecipeManager::Instance().Initialize();
 }
 
 extern "C" void Terminate()
 {
+	RecipeManager::Instance().Terminate();
 	WaferManager::Instance().Terminate();
 	DataRecorder::Instance().Terminate();
 	Interlock::Instance().Terminate();
@@ -46,6 +46,10 @@ int copy_string(char* json, unsigned buffer_size, const std::string& json_string
 	size_t string_size = json_string.size();
 	size_t size = std::min(string_size, buffer_size);
 	std::copy(json_string.c_str(), json_string.c_str()+size, json);
+	if((size+1) < buffer_size)
+	{
+		json[size] = 0;
+	}
 
 	return size;
 }
@@ -79,6 +83,10 @@ extern "C" int FetchParametersByPath(const char* path, char* json, unsigned buff
 
 extern "C" void ModifyParameter(int id, const char* value)
 {
+	std::stringstream ss;
+	ss<<"modify parameter [id="<<id<<", value="<<value<<"].";
+	LogInfo(ss.str());
+
 	SystemParameter::Instance().SetData(id, value);
 }
 
@@ -126,6 +134,10 @@ extern "C" int FetchSystemDataByPath(const char* path, bool only_changed, char* 
 
 extern "C" void ModifySystemData(int id, const char* value)
 {
+	std::stringstream ss;
+	ss<<"modify system data [id="<<id<<", value="<<value<<"].";
+	LogInfo(ss.str());
+
 	SystemDataPool::Instance().SetData(id, value);
 }
 
@@ -139,4 +151,22 @@ extern "C" int FetchRecentEventLog(char* json, unsigned buffer_size)
 extern "C" void Invoke(int unit, int cmd, unsigned param1, unsigned param2)
 {
 
+}
+
+extern "C" void LoadRecipe(const char* name)
+{
+	if(!name)
+		return;
+
+	std::stringstream ss;
+	ss<<"load recipe ["<<name<<"].";
+	LogInfo(ss.str());
+
+	RecipeManager::Instance().Load(name);
+}
+
+extern "C" void UnloadRecipe()
+{
+	LogInfo("unload recipe.");
+	RecipeManager::Instance().Unload();
 }

@@ -11,14 +11,33 @@
 #include "boost/property_tree/ptree.hpp"
 #include "boost/property_tree/json_parser.hpp"
 
+enum APCMode
+{
+	APCMode_Position,
+	APCMode_Pressure,
+};
+
+enum BypassMode
+{
+	BypassMode_None,
+	BypassMode_Bypass,
+	BypassMode_Chamber,
+};
+
 class RecipeStep
 {
 public:
-	RecipeStep(const std::string& name, int N2flow, int EtOHflow, int HFflow, float duration, int pressure)
-	: m_name(name), m_N2_flowrate(N2flow), m_EtOH_flowrate(EtOHflow), m_HF_flowrate(HFflow),
-	  m_duration(duration), m_pressure(pressure) {};
-	RecipeStep() : RecipeStep("", 0, 0, 0, 0.0f, 0){};
-	RecipeStep(const RecipeStep& rhs);
+	RecipeStep(const std::string& name, unsigned short duration, APCMode apc_mode, unsigned short position,
+			unsigned short pressure, unsigned short rotate_speed, BypassMode HF_bypass,
+			unsigned short HF_flow, BypassMode EtOH_bypass, unsigned short EtOH_flow, unsigned short N2_flow,
+			unsigned short N2_purge_flow)
+	: m_name(name), m_duration(duration), m_apc_mode(apc_mode), m_position(position), m_pressure(pressure),
+	  m_rotate_speed(rotate_speed), m_HF_bypass(HF_bypass), m_HF_flowrate(HF_flow), m_EtOH_bypass(EtOH_bypass),
+	  m_EtOH_flowrate(EtOH_flow), m_N2_flowrate(N2_flow), m_N2_purge_flowrate(N2_purge_flow) {};
+	RecipeStep() : RecipeStep("", 0, APCMode_Position, 0, 0, 0, BypassMode_None, 0, BypassMode_None, 0, 0, 0){};
+	RecipeStep(const RecipeStep& rhs) : RecipeStep(rhs.m_name, rhs.m_duration, rhs.m_apc_mode,
+			rhs.m_position, rhs.m_pressure, rhs.m_rotate_speed, rhs.m_HF_bypass, rhs.m_HF_flowrate,
+			rhs.m_EtOH_bypass, rhs.m_EtOH_flowrate, rhs.m_N2_flowrate, rhs.m_N2_purge_flowrate) {};
 	RecipeStep& operator = (const RecipeStep& rhs);
 
 	void Load(const boost::property_tree::ptree& pt);
@@ -29,38 +48,80 @@ public:
 		return m_name;
 	}
 
-	int N2Flowrate() const
-	{
-		return m_N2_flowrate;
-	}
-
-	int EtOHFlowrate() const
-	{
-		return m_EtOH_flowrate;
-	}
-
-	int HFFlowrate() const
-	{
-		return m_HF_flowrate;
-	}
-
-	float Duration() const
+	unsigned short Duration() const
 	{
 		return m_duration;
 	}
 
-	int Pressure() const
+	APCMode Mode() const
+	{
+		return m_apc_mode;
+	}
+
+	unsigned short Position() const
+	{
+		return m_position;
+	}
+
+	unsigned short Pressure() const
 	{
 		return m_pressure;
 	}
 
+	unsigned short RotateSpeed() const
+	{
+		return m_rotate_speed;
+	}
+
+	BypassMode HFBypass() const
+	{
+		return m_HF_bypass;
+	}
+
+	unsigned short HFFlowrate() const
+	{
+		return m_HF_flowrate;
+	}
+
+	BypassMode EtOHBypass() const
+	{
+		return m_EtOH_bypass;
+	}
+
+	unsigned short EtOHFlowrate() const
+	{
+		return m_EtOH_flowrate;
+	}
+
+	unsigned short N2Flowrate() const
+	{
+		return m_N2_flowrate;
+	}
+
+	unsigned short N2PurgeFlowrate() const
+	{
+		return m_N2_purge_flowrate;
+	}
+
+private:
+	static BypassMode bypass_from_string(const std::string& mode);
+	static std::string bypass_to_string(BypassMode mode);
+	static APCMode apc_from_string(const std::string& mode);
+	static std::string apc_to_string(APCMode mode);
+
 protected:
 	std::string m_name;
-	int m_N2_flowrate;
-	int m_EtOH_flowrate;
-	int m_HF_flowrate;
-	float m_duration;
-	int m_pressure;
+	unsigned short m_duration;
+	APCMode m_apc_mode;
+	unsigned short m_position;
+	unsigned short m_pressure;
+	unsigned short m_rotate_speed;
+	BypassMode m_HF_bypass;
+	unsigned short m_HF_flowrate;
+	BypassMode m_EtOH_bypass;
+	unsigned short m_EtOH_flowrate;
+	unsigned short m_N2_flowrate;
+	unsigned short m_N2_purge_flowrate;
 };
 
 class Recipe
@@ -84,9 +145,9 @@ public:
 		return m_name;
 	}
 
-	float Duration()
+	unsigned short Duration()
 	{
-		float dur = .0f;
+		unsigned short dur = 0;
 		for(RecipeStep& step : m_steps)
 		{
 			dur += step.Duration();

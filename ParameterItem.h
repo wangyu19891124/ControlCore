@@ -10,10 +10,13 @@
 
 #include <set>
 #include <typeinfo>
+#include <sstream>
 
 #include "boost/property_tree/ptree.hpp"
 
 #include "ParameterHolder.h"
+#include "LogFile.h"
+#include "Event.h"
 
 class ParameterItemBase
 {
@@ -47,7 +50,7 @@ class ParameterItem : public ParameterItemBase
 public:
 	ParameterItem(int id, const std::string& name,  const std::string& path,const std::string& description,
 			T min_value, T max_value, T default_value, const std::string& unit = "")
-		: ParameterItemBase(id, path, name, description, unit), m_min(min_value), m_max(max_value), m_default(default_value)
+		: ParameterItemBase(id, name, path, description, unit), m_min(min_value), m_max(max_value), m_default(default_value)
 	{
 		m_value = ParameterHolder::Instance().Read<T>(path, name, default_value);
 	}
@@ -63,15 +66,20 @@ public:
 	{
 		if(rhs>m_max || rhs<m_min)
 		{
-			//report warning...
+			EVT::ValueOutOfRange.Report(rhs, m_min, m_max, m_name);
 		}
 		else
 		{
+			T old_value;
 			{
 				boost::mutex::scoped_lock lock(m_mtx);
+				old_value = m_value;
 				m_value = rhs;
 			}
 			ParameterHolder::Instance().Write<T>(m_path, m_name, rhs);
+			std::stringstream ss;
+			ss<<"Parameter ["<<m_name<<"] changed, "<<old_value<<" -> "<<rhs<<".";
+			LogInfo(ss.str());
 		}
 
 		return rhs;
@@ -103,7 +111,7 @@ class ParameterItem<std::string> : public ParameterItemBase
 {
 public:
 	ParameterItem(int id, const std::string& name, const std::string& path, const std::string& description, std::string default_value)
-		: ParameterItemBase(id, path, description, ""), m_default(default_value)
+		: ParameterItemBase(id, name, path, description, ""), m_default(default_value)
 	{
 		m_value = ParameterHolder::Instance().Read<std::string>(path, name, default_value);
 	}
@@ -123,11 +131,16 @@ public:
 
 	ParameterItem& operator = (const std::string& rhs)
 	{
+		std::string old_value;
 		{
 			boost::mutex::scoped_lock lock(m_mtx);
+			old_value = m_value;
 			m_value = rhs;
 		}
 		ParameterHolder::Instance().Write(m_path, m_name, rhs);
+		std::stringstream ss;
+		ss<<"Parameter ["<<m_name<<"] changed, "<<old_value<<" -> "<<rhs<<".";
+		LogInfo(ss.str());
 
 		return *this;
 	}
@@ -151,6 +164,10 @@ private:
 	std::string m_value;
 };
 
+#define PARAMETER_NUMBER(id, type, name, path, description, min, max, default_value, unit) \
+	ParameterItem<type> name(id, #name, path, description, min, max, default_value, unit);
 
+#define PARAMETER_STRING(id, name, path, description, default_value) \
+		ParameterItem<std::string> name(id, #name, path, description, default_value);
 
 #endif /* PARAMETERITEM_H_ */

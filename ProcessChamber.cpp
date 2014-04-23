@@ -9,8 +9,8 @@
 #include "ProcessChamber.h"
 #include "Parameters.h"
 
-ProcessChamber::ProcessChamber(int id) :
-		SmartUnit(id)
+ProcessChamber::ProcessChamber(int id, const std::string& name) :
+		SmartUnit(id, name)
 {
 	// TODO Auto-generated constructor stub
 
@@ -39,21 +39,21 @@ void ProcessChamber::Terminate()
 
 UnitTask ProcessChamber::GetNextTask()
 {
-	UnitTask last_task = (m_task.type == Task_None) ? m_last_task : m_task;
-	if (last_task.type == Task_None)
-		return UnitTask{Task_Home, 0, 0};
-	else if (last_task.type == Task_Home)
-		return UnitTask{Task_Load, 0, 0};
-	else if (last_task.type == Task_Load)
-		return UnitTask{Task_Process, 0, 0};
-	else if (last_task.type == Task_Process)
-		return UnitTask{Task_Unload, 0, 0};
-	else if (last_task.type == Task_Unload)
-		return UnitTask{Task_Clean, 0, 0};
-	else if (last_task.type == Task_Clean)
-		return UnitTask{Task_Load, 0, 0};
+	UnitTask last_task = (m_task.type == TASK_NONE) ? m_last_task : m_task;
+	if (last_task.type == TASK_NONE)
+		return UnitTask{TASK_HOME, 0, 0};
+	else if (last_task.type == TASK_HOME)
+		return UnitTask{TASK_LOAD, 0, 0};
+	else if (last_task.type == TASK_LOAD)
+		return UnitTask{TASK_PROCESS, 0, 0};
+	else if (last_task.type == TASK_PROCESS)
+		return UnitTask{TASK_UNLOAD, 0, 0};
+	else if (last_task.type == TASK_UNLOAD)
+		return UnitTask{TASK_CLEAN, 0, 0};
+	else if (last_task.type == TASK_CLEAN)
+		return UnitTask{TASK_LOAD, 0, 0};
 
-	return UnitTask{Task_None, 0, 0};
+	return UnitTask{TASK_NONE, 0, 0};
 }
 
 void ProcessChamber::UpdateUnitInfo()
@@ -77,19 +77,19 @@ bool ProcessChamber::TranslateTask(const UnitTask& task)
 	//translate task
 	switch (task.type)
 	{
-	case Task_Home:
+	case TASK_HOME:
 		OnHome();
 		break;
-	case Task_Load:
+	case TASK_LOAD:
 		OnLoad();
 		break;
-	case Task_Process:
+	case TASK_PROCESS:
 		OnProcess();
 		break;
-	case Task_Unload:
+	case TASK_UNLOAD:
 		OnUnload();
 		break;
-	case Task_Clean:
+	case TASK_CLEAN:
 		OnClean();
 		break;
 	default:

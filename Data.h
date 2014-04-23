@@ -93,6 +93,7 @@ extern SystemData<unsigned> doAlcMFCBypassValve1;
 
 //user defined
 extern SystemData<unsigned> flag;
+extern SystemData<std::string> RecipeName;
 
 };
 

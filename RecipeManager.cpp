@@ -5,10 +5,14 @@
  *      Author: acm
  */
 
+#include <sstream>
+
 #include "boost/filesystem.hpp"
 
 #include "RecipeManager.h"
-#include "utility.h"
+#include "Utility.h"
+#include "Data.h"
+#include "LogFile.h"
 
 namespace fs = boost::filesystem;
 
@@ -110,5 +114,8 @@ void RecipeManager::DeleteRecipe(const std::string& recipe_name)
 
 void RecipeManager::UpdateInformation()
 {
-
+	Data::RecipeName = m_rcp.Name();
+	std::stringstream ss;
+	ss<<"Recipe changed, current recipe is ["<<m_rcp.Name()<<"].";
+	LogInfo(ss.str());
 }

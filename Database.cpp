@@ -250,7 +250,7 @@ void Database::do_work()
 			LogInfo(sql);
 			boost::mutex::scoped_lock lock(m_db_mtx);
 			int rtv = mysql_query(&m_mysql, sql.c_str());
-			if(!rtv)
+			if(rtv)
 			{
 				LogError("mysql insert failed.");
 			}

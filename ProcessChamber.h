@@ -14,7 +14,7 @@ class ProcessChamber: public SmartUnit,
 		public boost::noncopyable
 {
 public:
-	ProcessChamber(int id);
+	ProcessChamber(int id, const std::string& name);
 	virtual ~ProcessChamber();
 
 	virtual void Initialize();

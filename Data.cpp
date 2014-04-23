@@ -92,5 +92,6 @@ SystemData<unsigned> doAlcMFCBypassValve1(1016, "doAlcMFCBypassValve1", "DO", 0,
 
 //user defined
 SystemData<unsigned> flag(100011, "flag", "UserDefine", 0, 1000);
+SystemData<std::string> RecipeName(100013, "RecipeName", "UserDefine");
 
 }

@@ -46,6 +46,12 @@ public:
 		EventLogger::Instance().Log(m_evt_id, m_evt_level, boost::str(boost::format(m_format_string)%arg1%arg2%arg3));
 	}
 
+	template<typename T1, typename T2, typename T3, typename T4>
+	void Report(T1 arg1, T2 arg2, T3 arg3, T4 arg4)
+	{
+		EventLogger::Instance().Log(m_evt_id, m_evt_level, boost::str(boost::format(m_format_string)%arg1%arg2%arg3%arg4));
+	}
+
 private:
 	unsigned int m_evt_id;
 	EventLevel m_evt_level;

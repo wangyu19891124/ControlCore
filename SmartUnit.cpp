@@ -6,12 +6,12 @@
  */
 #include "SmartUnit.h"
 
-SmartUnit::SmartUnit(int id) :
-		m_id(id), m_hp(0), m_need_home(true), m_state(State_Idle),
+SmartUnit::SmartUnit(int id, const std::string& name) :
+		m_id(id), m_name(name), m_hp(0), m_need_home(true), m_state(State_Idle),
 		m_pause_flag(false), m_step_name(""), m_can_retry(false)
 {
-	m_last_task = UnitTask{Task_None, 0, 0};
-	m_task = UnitTask{Task_None, 0, 0};
+	m_last_task = UnitTask{TASK_NONE, 0, 0};
+	m_task = UnitTask{TASK_NONE, 0, 0};
 }
 
 SmartUnit::~SmartUnit()
@@ -21,15 +21,23 @@ SmartUnit::~SmartUnit()
 void SmartUnit::Initialize()
 {
 	//subclass should call __base::Initialize in the last
-	boost::function<void ()> f;
-	f = boost::bind(&SmartUnit::work_fun, this);
-	m_thrd.reset(new boost::thread(f));
+	m_thrd.reset(new boost::thread([this](){work_fun();}));
 }
+
 void SmartUnit::Terminate()
 {
 	//subclass should call __base::Terminate in the first
 	m_thrd->interrupt();
 	m_thrd->join();
+	m_thrd.reset(nullptr);
+}
+
+void SmartUnit::Invoke(int cmd, unsigned param1, unsigned param2)
+{
+	if(!CanManualOperate())
+		return;
+
+	TranslateTask(UnitTask{cmd, param1, param2});
 }
 
 void SmartUnit::Online(int hp)
@@ -90,17 +98,20 @@ void SmartUnit::Resume()
 
 bool SmartUnit::TranslateTask(const UnitTask& task)
 {
-	if (m_task.type != Task_None && task.type != m_task.type)
+	if (m_task.type != TASK_NONE && task.type != m_task.type)
 		m_last_task = m_task;
 
 	m_task = task;
 
-	if (task.type == Task_None)
+	if (task.type == TASK_NONE)
 		return false;
 
 	{
 		boost::mutex::scoped_lock lock(m_mtx);
-		m_hp--;
+		if(m_hp>0)
+		{
+			m_hp--;
+		}
 	}
 
 	return true;
@@ -189,10 +200,10 @@ bool SmartUnit::CanPause()
 {
 	switch (m_task.type)
 	{
-	case Task_Process:
-	case Task_Clean:
-	case Task_Load:
-	case Task_Unload:
+	case TASK_PROCESS:
+	case TASK_CLEAN:
+	case TASK_LOAD:
+	case TASK_UNLOAD:
 		return false;
 	default:
 		return true;

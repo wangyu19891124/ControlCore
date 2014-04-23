@@ -19,39 +19,43 @@
 #include "DeviceManager.h"
 #include "Worker.h"
 #include "LogFile.h"
+#include "Event.h"
 
 const int NoRelatedDevice = -1;
 
 //typedef boost::function<unsigned int (const std::vector<unsigned char>&)> ReadFunc;
 //typedef boost::function<void (std::vector<unsigned char>&, unsigned int)> WriteFunc;
 template<typename T>
-T DefaultDataConvert(T data)
+T ConvertDefault(T data)
 {
 	return data;
 }
 
 template<typename T1, typename T2>
-T1 MemeryDataConvert(T2 data)
+T1 ConvertMemery(T2 data)
 {
 	static_assert(sizeof(T1) == sizeof(T2), "The size of T1 and T2 are different in MemeryDataConvert.");
 
-	T1 t;
-	memcpy(&t, &data, sizeof(T1));
-	return t;
+	return *((T1*)&data);
 }
 
 template<typename T1, typename T2>
-T1 StaticDataConvert(T2 data)
+T1 ConvertStatic(T2 data)
 {
 	return static_cast<T1>(data);
+}
+
+template<typename T>
+T ConvertNot(T data)
+{
+	return data ? 0 : 1;
 }
 
 class BaseSystemData
 {
 public:
-	BaseSystemData(int id, const std::string& name,
-			const std::string& path);
-	virtual ~BaseSystemData();
+	BaseSystemData(int id, const std::string& name,	const std::string& path);
+	virtual ~BaseSystemData() = default;
 
 	virtual void Serialize(boost::property_tree::ptree& pt) = 0;
 	virtual const std::type_info& Type() = 0;
@@ -81,8 +85,8 @@ public:
 	SystemData(int id, const std::string& name, const std::string& path, T min, T max, int precision, int device,
 			unsigned int block, unsigned int byte_offset, unsigned short bit_offset,
 			unsigned short bits, bool writable, const std::string& unit = "",
-			boost::function<T (unsigned int)> raw_to_real = DefaultDataConvert<unsigned int>,
-			boost::function<unsigned int (T)> real_to_raw = DefaultDataConvert<unsigned int>)
+			boost::function<T (unsigned int)> raw_to_real = ConvertDefault<unsigned int>,
+			boost::function<unsigned int (T)> real_to_raw = ConvertDefault<unsigned int>)
 	: BaseSystemData(id, name, path), m_unit(unit), m_min(min), m_max(max), m_precision(precision), m_device(device),
 	  m_block(block), m_byte_offset(byte_offset), m_bit_offset(bit_offset), m_bits(bits), m_writable(writable), m_data(T()),
 	  m_token(0), m_raw_to_real(raw_to_real), m_real_to_raw(real_to_raw){};
@@ -103,7 +107,7 @@ public:
 		{
 			std::stringstream ss;
 			ss<<m_name<<" can't be written.";
-			throw ss.str();
+			LogWarning(ss.str());
 		}
 
 		if(rhs<=m_max && rhs>=m_min && rhs!=m_data)
@@ -120,10 +124,9 @@ public:
 		}
 		else
 		{
-			//TODO comment the 3 line after debugging.
-			std::stringstream ss;
-			ss<<m_name<<" is assigned "<<rhs<<", it's out of range ["<<m_min<<", "<<m_max<<"].";
-			throw ss.str();
+			EVT::ValueOutOfRange.Report(rhs, m_min, m_max, m_name);
+
+			return *this;
 		}
 
 		WriteData();
@@ -308,13 +311,13 @@ public:
 	{
 		using namespace boost::property_tree;
 		ptree node;
+		node.add<int>("id", m_id);
 		{
 			boost::mutex::scoped_lock lock(m_mtx);
-			node.add<int>("id", m_id);
-			node.add<std::string>("value", m_data);
+			node.add("value", m_data);
 			m_changed_flag = false;
 		}
-		pt.add_child("SystemData.Data", node);
+		pt.push_back(make_pair("", node));
 	}
 
 	virtual const std::type_info& Type()

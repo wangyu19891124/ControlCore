@@ -28,6 +28,9 @@ int FetchRecentEventLog(char* json, unsigned buffer_size);
 
 void Invoke(int unit, int cmd, unsigned param1, unsigned param2);
 
+void LoadRecipe(const char* name);
+void UnloadRecipe();
+
 
 }
 
