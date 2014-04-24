@@ -31,7 +31,7 @@ SystemData<unsigned> diN2FacSplPrsULmt(17, "diN2FacSplPrsULmt", "DI", 0, 1, 0, 0
 SystemData<unsigned> diN2FacSplPrsLLmt(18, "diN2FacSplPrsLLmt", "DI", 0, 1, 0, 0, 0, 17, 0, 1, false);
 SystemData<unsigned> diN2PgVapPrsULmt(19, "diN2PgVapPrsULmt", "DI", 0, 1, 0, 0, 0, 18, 0, 1, false);
 SystemData<unsigned> diN2PgVapPrsLLmt(20, "diN2PgVapPrsLLmt", "DI", 0, 1, 0, 0, 0, 19, 0, 1, false);
-SystemData<unsigned> diCDAInletAlarm(21, "diCDAInletAlarm", "DI", 0, 1, 0, 0, 0, 20, 0, 1, false,"",ConvertNot<unsigned int>);
+SystemData<unsigned> diCDAInletAlarm(21, "diCDAInletAlarm", "DI", 0, 1, 0, 0, 0, 20, 0, 1, false, "", ConvertNot<unsigned int>);
 SystemData<unsigned> diFacVPrsSwtLLmt(22, "diFacVPrsSwtLLmt", "DI", 0, 1, 0, 0, 0, 21, 0, 1, false);
 SystemData<unsigned> diExpCbVPrsSwtULmt(23, "diExpCbVPrsSwtULmt", "DI", 0, 1, 0, 0, 0, 22, 0, 1, false);
 SystemData<unsigned> diExpCbVPrsSwtLLmt(24, "diExpCbVPrsSwtLLmt", "DI", 0, 1, 0, 0, 0, 23, 0, 1, false);
@@ -76,84 +76,157 @@ SystemData<unsigned> diPrcCbLidRightClose(70, "diPrcCbLidRightClose", "DI", 0, 1
 SystemData<unsigned> diCbLeftDoorClose(76, "diCbLeftDoorClose", "DI", 0, 1, 0, 0, 0, 75, 0, 1, false);
 SystemData<unsigned> diCbRightDoorClose(77, "diCbRightDoorClose", "DI", 0, 1, 0, 0, 0, 76, 0, 1, false);
 SystemData<unsigned> diCbHFConAlarm(78, "diCbHFConAlarm","DI",0,1,0,0,0,77,0,1,false,"",ConvertNot<unsigned int>);
-SystemData<unsigned> diProcCbBodyHeater(79, "diProcCbBodyHeater","DI/Heater",0,1,0,0,4,0,0,1,false);
-SystemData<unsigned> diProcCbLidHeater(80, "diProcCbLidHeater","DI/Heater",0,1,0,0,4,1,0,1,false);
-SystemData<unsigned> diProcCbChuckHeater(81, "diProcCbChuckHeater","DI/Heater",0,1,0,0,4,2,0,1,false);
-SystemData<unsigned> diCbA1MotorAlarm(82,"diCbA1MotorAlarm","DI/Motion",0,1,0,0,5,0,0,1,false);
-SystemData<unsigned> diCbA1MotorCWLmit(83,"diCbA1MotorCWLmit","DI/Motion",0,1,0,0,5,1,0,1,false,"",ConvertNot<unsigned int>);
-SystemData<unsigned> diCbA1MotorCCWLmit(84,"diCbA1MotorCCWLmit","DI/Motion",0,1,0,0,5,2,0,1,false,"",ConvertNot<unsigned int>);
-SystemData<unsigned> diCbMotorHome(85,"diCbMotorHome","DI/Motion",0,1,0,0,5,3,0,1,false);
 
 
 //DO
-SystemData<unsigned> doRedLight(1000,"doRedLight","DO",0,1,0,0,1,0,0,1,true);
-SystemData<unsigned> doRedFlash(1001,"doRedFlash","DO",0,1,0,0,1,1,0,1,true);
-SystemData<unsigned> doYellowLight(1002,"doYellowLight","DO",0,1,0,0,1,2,0,1,true);
-SystemData<unsigned> doYellowFlash(1003,"doYellowFlash","DO",0,1,0,0,1,3,0,1,true);
-SystemData<unsigned> doGreenLight(1004,"doGreenLight","DO",0,1,0,0,1,4,0,1,true);
-SystemData<unsigned> doGreenFlash(1005,"doGreenFlash","DO",0,1,0,0,1,5,0,1,true);
-SystemData<unsigned> doBlueLight(1006,"doBlueLight","DO",0,1,0,0,1,6,0,1,true);
-SystemData<unsigned> doBlueFlash(1007,"doBlueFlash","DO",0,1,0,0,1,7,0,1,true);
-SystemData<unsigned> doBuzzerWarn(1008,"doBuzzerWarn","DO",0,1,0,0,1,8,0,1,true);
-SystemData<unsigned> doBuzzerAlarm(1009,"doBuzzerAlarm","DO",0,1,0,0,1,9,0,1,true);
+SystemData<unsigned> aoRedLight(1000,"aoRedLight","DO",0,256,0,0,1,0,0,16,true);
+SystemData<unsigned> aoYellowLight(1002,"aoYellowLight","DO",0,256,0,0,1,2,0,16,true);
+SystemData<unsigned> aoGreenLight(1004,"aoGreenLight","DO",0,256,0,0,1,4,0,16,true);
+SystemData<unsigned> aoBlueLight(1006,"aoBlueLight","DO",0,256,0,0,1,6,0,16,true);
+SystemData<unsigned> aoBuzzer(1008,"aoBuzzerWarn","DO",0,256,0,0,1,8,0,16,true);
 SystemData<unsigned> doHeartBeat(1010,"doHeartBeat","DO",0,1,0,0,1,10,0,1,true);
 SystemData<unsigned> doEnableVPump(1011,"doEnableVPump","DO",0,1,0,0,1,11,0,1,true);
 SystemData<unsigned> doHFRequest(1012,"doHFRequest","DO",0,1,0,0,1,12,0,1,true);
-SystemData<unsigned> doN2PurgeGasValve(1013,"doN2PurgeGasValve","DO",0,1,0,0,1,16,0,1,true);
-SystemData<unsigned> doExpCbVacValve(1014,"doExpCbVacValve","DO",0,1,0,0,1,18,0,1,true);
-SystemData<unsigned> doExpCbVapVacValve(1015,"doExpCbVapVacValve","DO",0,1,0,0,1,19,0,1,true);
-SystemData<unsigned> doAlcMFCBypassVal1(1016,"doAlcMFCBypassVal1","DO",0,1,0,0,1,21,0,1,true);
-SystemData<unsigned> doAlcMFCBypassVal2(1017,"doAlcMFCBypassVal2","DO",0,1,0,0,1,22,0,1,true);
-SystemData<unsigned> doAlcMFCBypassVal3(1018,"doAlcMFCBypassVal3","DO",0,1,0,0,1,23,0,1,true);
-SystemData<unsigned> doVapSupplyN2Valve(1019,"doVapSupplyN2Valve","DO",0,1,0,0,1,24,0,1,true);
-SystemData<unsigned> doVapBypassValve(1020,"doVapBypassValve","DO",0,1,0,0,1,25,0,1,true);
-SystemData<unsigned> doA2cMFCBypassVal1(1021,"doA2cMFCBypassVal1","DO",0,1,0,0,1,26,0,1,true);
-SystemData<unsigned> doA2cMFCBypassVal2(1022,"doA2cMFCBypassVal2","DO",0,1,0,0,1,27,0,1,true);
-SystemData<unsigned> doA2cMFCBypassVal3(1023,"doA2cMFCBypassVal3","DO",0,1,0,0,1,28,0,1,true);
-SystemData<unsigned> doA3cMFCBypassVal1(1024,"doA3cMFCBypassVal1","DO",0,1,0,0,1,29,0,1,true);
-SystemData<unsigned> doA3cMFCBypassVal2(1025,"doA3cMFCBypassVal2","DO",0,1,0,0,1,30,0,1,true);
-SystemData<unsigned> doVaVapValve(1026,"doVaVapValve","DO",0,1,0,0,1,32,0,1,true);
-SystemData<unsigned> doVaHFValve(1027,"doVaHFValve","DO",0,1,0,0,1,33,0,1,true);
-SystemData<unsigned> doVaSupplyIPAValve(1028,"doVaSupplyIPAValve","DO",0,1,0,0,1,34,0,1,true);
-SystemData<unsigned> doExpCbVacIPASupply(1029,"doExpCbVacIPASupply","DO",0,1,0,0,1,35,0,1,true);
-SystemData<unsigned> doAlcTankOpen(1030,"doAlcTankOpen","DO",0,1,0,0,1,36,0,1,true);
-SystemData<unsigned> doPurgeAlcTank(1031,"doPurgeAlcTank","DO",0,1,0,0,1,37,0,1,true);
-SystemData<unsigned> doExpCbHFInletVal(1032,"doExpCbHFInletVal","DO",0,1,0,0,1,38,0,1,true);
-SystemData<unsigned> doHFFacSupplyVal(1033,"doHFFacSupplyVal","DO",0,1,0,0,1,39,0,1,true);
-SystemData<unsigned> doN2PurgeHFVal(1034,"doN2PurgeHFVal","DO",0,1,0,0,1,40,0,1,true);
-SystemData<unsigned> doExpCbSupplyCbVal(1035,"doExpCbSupplyCbVal","DO",0,1,0,0,1,41,0,1,true);
-SystemData<unsigned> doN2SupplyVacVal(1036,"doN2SupplyVacVal","DO",0,1,0,0,1,48,0,1,true);
-SystemData<unsigned> doN2SupplyProcVal(1037,"doN2SupplyProcVal","DO",0,1,0,0,1,49,0,1,true);
-SystemData<unsigned> doA4cMFCBypassVal1(1038,"doA4cMFCBypassVal1","DO",0,1,0,0,1,50,0,1,true);
-SystemData<unsigned> doA4cMFCBypassVal2(1039,"doA4cMFCBypassVal2","DO",0,1,0,0,1,51,0,1,true);
-SystemData<unsigned> doPinUpVal(1040,"doPinUpVal","DO",0,1,0,0,1,52,0,1,true);
-SystemData<unsigned> doVacFastProcCbVal(1041,"doVacFastProcCbVal","DO",0,1,0,0,1,56,0,1,true);
-SystemData<unsigned> doVacSlowProcCbVal(1042,"doVacSlowProcCbVal","DO",0,1,0,0,1,57,0,1,true);
-SystemData<unsigned> doPinDownVal(1042,"doPinDownVal","DO",0,1,0,0,1,63,0,1,true);
-SystemData<unsigned> doCbGateVal(1043,"doCbGateVal","DO",0,1,0,0,1,71,0,1,true);
-SystemData<unsigned> doHeartbeatIntlk(1044,"doHeartbeatIntlk","DO",0,1,0,0,1,80,0,1,true,"",ConvertNot<unsigned int>);
-SystemData<unsigned> doMainVacIntlk(1045,"doMainVacIntlk","DO",0,1,0,0,1,81,0,1,true,"",ConvertNot<unsigned int>);
-SystemData<unsigned> doGeneralIntlk(1046,"doGeneralIntlk","DO",0,1,0,0,1,82,0,1,true,"",ConvertNot<unsigned int>);
-SystemData<unsigned> doCHEM1ReqIntlk(1047,"doCHEM1ReqIntlk","DO",0,1,0,0,1,83,0,1,true,"",ConvertNot<unsigned int>);
-SystemData<unsigned> doResetLED(1049,"doResetLED","DO",0,1,0,0,1,84,0,1,true);
-SystemData<unsigned> doHWIntlk(1050,"doHWIntlk","DO",0,1,0,0,1,85,0,1,true,"",ConvertNot<unsigned int>);
-SystemData<unsigned> doN2PurgeGasIntlk(1051,"doN2PurgeGasIntlk","DO",0,1,0,0,1,86,0,1,true,"",ConvertNot<unsigned int>);
-SystemData<unsigned> doMotionIntlk(1052,"doMotionIntlk","DO",0,1,0,0,1,87,0,1,true,"",ConvertNot<unsigned int>);
-SystemData<unsigned> doProcCbBodyHeatEnable(1053,"doProcCbBodyHeatEnable","DO",0,1,0,0,1,88,0,1,true);
-SystemData<unsigned> doProcCbLidHeatEnable(1054,"doProcCbLidHeatEnable","DO",0,1,0,0,1,89,0,1,true);
-SystemData<unsigned> doCbCkHeatEnable(1055,"doCbCkHeatEnable","DO",0,1,0,0,1,90,0,1,true);
-SystemData<unsigned> doCbMotorServoOn(1056,"doCbMotorServoOn","DO",0,1,0,0,5,0,0,1,true);
+SystemData<unsigned> doN2PurgeGBValve(1016,"doN2PurgeGBValve","DO",0,1,0,0,1,16,0,1,true);
+SystemData<unsigned> doExpCbVacValve(1018,"doExpCbVacValve","DO",0,1,0,0,1,18,0,1,true);
+SystemData<unsigned> doExpCbVapVacValve(1019,"doExpCbVapVacValve","DO",0,1,0,0,1,19,0,1,true);
+SystemData<unsigned> doAlcMFCBypassVal1(1021,"doAlcMFCBypassVal1","DO",0,1,0,0,1,21,0,1,true);
+SystemData<unsigned> doAlcMFCBypassVal2(1022,"doAlcMFCBypassVal2","DO",0,1,0,0,1,22,0,1,true);
+SystemData<unsigned> doAlcMFCBypassVal3(1023,"doAlcMFCBypassVal3","DO",0,1,0,0,1,23,0,1,true);
+SystemData<unsigned> doVapSupplyN2Valve(1024,"doVapSupplyN2Valve","DO",0,1,0,0,1,24,0,1,true);
+SystemData<unsigned> doVapBypassValve(1025,"doVapBypassValve","DO",0,1,0,0,1,25,0,1,true);
+SystemData<unsigned> doA2cMFCBypassVal1(1026,"doA2cMFCBypassVal1","DO",0,1,0,0,1,26,0,1,true);
+SystemData<unsigned> doA2cMFCBypassVal2(1027,"doA2cMFCBypassVal2","DO",0,1,0,0,1,27,0,1,true);
+SystemData<unsigned> doA2cMFCBypassVal3(1028,"doA2cMFCBypassVal3","DO",0,1,0,0,1,28,0,1,true);
+SystemData<unsigned> doA3cMFCBypassVal1(1029,"doA3cMFCBypassVal1","DO",0,1,0,0,1,29,0,1,true);
+SystemData<unsigned> doA3cMFCBypassVal2(1030,"doA3cMFCBypassVal2","DO",0,1,0,0,1,30,0,1,true);
+SystemData<unsigned> doVaVapValve(1032,"doVaVapValve","DO",0,1,0,0,1,32,0,1,true);
+SystemData<unsigned> doVaHFValve(1033,"doVaHFValve","DO",0,1,0,0,1,33,0,1,true);
+SystemData<unsigned> doVaSupplyIPAValve(1034,"doVaSupplyIPAValve","DO",0,1,0,0,1,34,0,1,true);
+SystemData<unsigned> doExpCbVacIPASupply(1035,"doExpCbVacIPASupply","DO",0,1,0,0,1,35,0,1,true);
+SystemData<unsigned> doAlcTankOpen(1036,"doAlcTankOpen","DO",0,1,0,0,1,36,0,1,true);
+SystemData<unsigned> doPurgeAlcTank(1037,"doPurgeAlcTank","DO",0,1,0,0,1,37,0,1,true);
+SystemData<unsigned> doExpCbHFInletVal(1038,"doExpCbHFInletVal","DO",0,1,0,0,1,38,0,1,true);
+SystemData<unsigned> doHFFacSupplyVal(1039,"doHFFacSupplyVal","DO",0,1,0,0,1,39,0,1,true);
+SystemData<unsigned> doN2PurgeHFVal(1040,"doN2PurgeHFVal","DO",0,1,0,0,1,40,0,1,true);
+SystemData<unsigned> doExpCbSupplyCbVal(1041,"doExpCbSupplyCbVal","DO",0,1,0,0,1,41,0,1,true);
+SystemData<unsigned> doN2SupplyVacVal(1048,"doN2SupplyVacVal","DO",0,1,0,0,1,48,0,1,true);
+SystemData<unsigned> doN2SupplyProcVal(1049,"doN2SupplyProcVal","DO",0,1,0,0,1,49,0,1,true);
+SystemData<unsigned> doA4cMFCBypassVal1(1050,"doA4cMFCBypassVal1","DO",0,1,0,0,1,50,0,1,true);
+SystemData<unsigned> doA4cMFCBypassVal2(1051,"doA4cMFCBypassVal2","DO",0,1,0,0,1,51,0,1,true);
+SystemData<unsigned> doPinUpVal(1052,"doPinUpVal","DO",0,1,0,0,1,52,0,1,true);
+SystemData<unsigned> doVacFastProcCbVal(1056,"doVacFastProcCbVal","DO",0,1,0,0,1,56,0,1,true);
+SystemData<unsigned> doVacSlowProcCbVal(1057,"doVacSlowProcCbVal","DO",0,1,0,0,1,57,0,1,true);
+SystemData<unsigned> doPinDownVal(1063,"doPinDownVal","DO",0,1,0,0,1,63,0,1,true);
+SystemData<unsigned> doCbGateVal(1071,"doCbGateVal","DO",0,1,0,0,1,71,0,1,true);
+
 
 
 //AI
-SystemData<unsigned> aiFacVacPrs(2000,"aiFacVacPrs","AI",0,0x101,0,0,2,0,0,16,false,"KPA");
-SystemData<unsigned> aiExpCbVacPrs(2001,"aiExpCbVacPrs","AI",0,0x101,0,0,2,1,0,16,false,"KPA");
+SystemData<float> aiFacPressure(2000,"aiFacPressure","AI",0,0,2,0,2,0,0,16,false,"kPa", ConvertLinear<float,unsigned>(0, 32767, -100.0f, 100.0f));
+SystemData<float> aiExpPressure(2002,"aiExpPressure","AI",0,0,2,0,2,2,0,16,false,"kPa", ConvertLinear<float,unsigned>(0, 32767, -100.0f, 100.0f));
+SystemData<float> aiAlcPressure(2004,"aiAlcPressure","AI",0,0,2,0,2,4,0,16,false,"kPa", ConvertLinear<float,unsigned>(0, 32767, -100.0f, 1000.0f));
+SystemData<float> aiAlcTankPressure(2006,"aiAlcTankPressure","AI",0,0,2,0,2,6,0,16,false,"kPa", ConvertLinear<float,unsigned>(0, 32767, -100.0f, 1000.0f));
+SystemData<float> aiHFSupplyPressure(2008,"aiHFSupplyPressure","AI",0,0,2,0,2,8,0,16,false,"kPa", ConvertLinear<float,unsigned>(0, 32767, -100.0f, 1000.0f));
+SystemData<float> aiAlcGasLeak(2010,"aiAlcGasLeak","AI",0,0,1,0,2,10,0,16,false,"%", ConvertLinear<float,unsigned>(0, 32767, 0.0f, 100.0f));
+SystemData<float> aiHFGasboxPPM(2012,"aiHFGasboxPPM","AI",0,0,2,0,2,12,0,16,false,"ppm", ConvertLinear<float,unsigned>(0, 32767, 0.0f, 10.0f));
+SystemData<float> aiHFChamberPPM(2014,"aiHFChamberPPM","AI",0,0,2,0,2,14,0,16,false,"ppm", ConvertLinear<float,unsigned>(0, 32767, 0.0f, 10.0f));
 
 
+//AO
 
-SystemData<unsigned> aoRedLight(1000, "aoRedLight", "DO", 0, 0x101, 0, 0, 1, 0, 0, 16, true);
-SystemData<unsigned> aoYellowLight(1001, "aoYellowLight", "DO", 0, 0x101, 0, 0, 1, 2, 0, 16, true);
-SystemData<unsigned> aoGreenLight(1002, "aoGreenLight", "DO", 0, 0x101, 0, 0, 1, 4, 0, 16, true);
+
+//Body Heater
+SystemData<float> aiBodyHTTemp(4000, "aiBodyHTTemp","Heater",0,0,1,0,4,0,0,32,false,"Cels",ConvertMemery<float, unsigned>);
+SystemData<unsigned> aiBodyHTErrCode(4008, "aiBodyHTErrCode","Heater",0,0,0,0,4,8,0,16,false);
+SystemData<unsigned> diBodyHTPowRdy(4010, "diBodyHTPowRdy","Heater",0,1,0,0,4,10,0,1,false);
+SystemData<unsigned> diBodyHTErr(4011, "diBodyHTErr","Heater",0,1,0,0,4,11,0,1,false);
+SystemData<unsigned> doBodyHTEnable(4018, "doBodyHTEnable","Heater",0,1,0,0,4,18,0,1,true);
+SystemData<float> aoBodyHTTempSet(4026, "aoBodyHTTempSet","Heater",0,1000,1,0,4,26,0,32,true,"Cels",ConvertMemery<float, unsigned>,ConvertMemery<unsigned, float>);
+
+//Lid Heater
+SystemData<float> aiLidHTTemp(5000, "aiLidHTTemp","Heater",0,0,1,0,5,0,0,32,false,"Cels",ConvertMemery<float, unsigned>);
+SystemData<unsigned> aiLidHTErrCode(5008, "aiLidHTErrCode","Heater",0,0,0,0,5,8,0,16,false);
+SystemData<unsigned> diLidHTPowRdy(5010, "diLidHTPowRdy","Heater",0,1,0,0,5,10,0,1,false);
+SystemData<unsigned> diLidHTErr(5011, "diLidHTErr","Heater",0,1,0,0,5,11,0,1,false);
+SystemData<unsigned> doLidHTEnable(5018, "doLidHTEnable","Heater",0,1,0,0,5,18,0,1,true);
+SystemData<float> aoLidHTTempSet(5026, "aoLidHTTempSet","Heater",0,1000,1,0,5,26,0,32,true,"Cels",ConvertMemery<float, unsigned>,ConvertMemery<unsigned, float>);
+
+
+//Chuck Heater
+SystemData<float> aiChuckHTTemp(6000, "aiChuckHTTemp","Heater",0,0,1,0,6,0,0,32,false,"Cels",ConvertMemery<float, unsigned>);
+SystemData<unsigned> aiChuckHTErrCode(6008, "aiChuckHTErrCode","Heater",0,0,0,0,6,8,0,16,false);
+SystemData<unsigned> diChuckHTPowRdy(6010, "diChuckHTPowRdy","Heater",0,1,0,0,6,10,0,1,false);
+SystemData<unsigned> diChuckHTErr(6011, "diChuckHTErr","Heater",0,1,0,0,6,11,0,1,false);
+SystemData<unsigned> doChuckHTEnable(6018, "doChuckHTEnable","Heater",0,1,0,0,6,18,0,1,true);
+SystemData<float> aoChuckHTTempSet(6026, "aoChuckHTTempSet","Heater",0,1000,1,0,6,26,0,32,true,"Cels",ConvertMemery<float, unsigned>,ConvertMemery<unsigned, float>);
+
+
+//Motion
+SystemData<unsigned> diHomeSensor(7000,"diHomeSensor","Motion",0,1,0,0,7,0,0,1,false);
+SystemData<unsigned> diCWLimitStatus(7001,"diCWLimitStatus","Motion",0,1,0,0,7,1,0,1,false,"",ConvertNot<unsigned>);
+SystemData<unsigned> diCCWLimitStatus(7002,"diCCWLimitStatus","Motion",0,1,0,0,7,2,0,1,false,"",ConvertNot<unsigned>);
+SystemData<unsigned> diReachPosition(7003,"diReachPosition","Motion",0,1,0,0,7,3,0,1,false);
+SystemData<unsigned> diDriverAlarm(7004,"diDriverAlarm","Motion",0,1,0,0,7,4,0,1,false);
+SystemData<unsigned> diAxisError(7008,"diAxisError","Motion",0,1,0,0,7,8,0,1,false);
+SystemData<unsigned> diAxisErrStop(7009,"diAxisErrStop","Motion",0,1,0,0,7,9,0,1,false);
+SystemData<unsigned> diAxisDisabled(7010,"diAxisDisabled","Motion",0,1,0,0,7,10,0,1,false);
+SystemData<unsigned> diAxisStandStill(7011,"diAxisStandStill","Motion",0,1,0,0,7,11,0,1,false);
+SystemData<unsigned> diAxisMoving(7012,"diAxisMoving","Motion",0,1,0,0,7,12,0,1,false);
+SystemData<unsigned> diAxisNotMoving(7013,"diAxisNotMoving","Motion",0,1,0,0,7,13,0,1,false);
+//SystemData<unsigned> diAxisStopCmdBusy(7018,"diAxisStopCmdBusy","Motion",0,1,0,0,7,18,0,1,false);
+//SystemData<unsigned> diAxisStopDone(7019,"diAxisStopDone","Motion",0,1,0,0,7,19,0,1,false);
+//SystemData<unsigned> diAxisRstCmdBusy(7020,"diAxisRstCmdBusy","Motion",0,1,0,0,7,20,0,1,false);
+//SystemData<unsigned> diAxisRstDone(7021,"diAxisRstDone","Motion",0,1,0,0,7,21,0,1,false);
+//SystemData<unsigned> diAxisServoCmdBusy(7022,"diAxisServoCmdBusy","Motion",0,1,0,0,7,22,0,1,false);
+//SystemData<unsigned> diAxisServoDone(7023,"diAxisServoDone","Motion",0,1,0,0,7,23,0,1,false);
+SystemData<unsigned> aiAxisErrCode(7040, "aiAxisErrCode","Motion",0,0,0,0,7,40,0,32,false);
+SystemData<float> aiActualPosition(7044, "aiActualPosition","Motion",0,0,1,0,7,44,0,32,false,"deg",ConvertMemery<float, unsigned>);
+SystemData<float> aiActualVelocity(7048, "aiActualVelocity","Motion",0,0,1,0,7,48,0,32,false,"deg/s",ConvertMemery<float, unsigned>);
+
+SystemData<unsigned> aoAxisControl(7052, "aoAxisControl","Motion",0,255,0,0,7,52,0,8,true);
+SystemData<unsigned> doAxisExecute(7053, "doAxisExecute","Motion",0,1,0,0,7,53,0,1,true);
+SystemData<unsigned> doAxisServoOn(7054, "doAxisServoOn","Motion",0,1,0,0,7,54,0,1,true);
+SystemData<unsigned> doAxisReset(7055, "doAxisReset","Motion",0,1,0,0,7,55,0,1,true);
+SystemData<float> aoAxisStopDec(7062, "aoAxisStopDec","Motion",0,100,1,0,7,62,0,32,true,"deg/s2",ConvertMemery<float, unsigned>,ConvertMemery<unsigned, float>);
+SystemData<float> aoAxisStopJerk(7066, "aoAxisStopJerk","Motion",0,100,1,0,7,66,0,32,true,"deg/s3",ConvertMemery<float, unsigned>,ConvertMemery<unsigned, float>);
+SystemData<float> aoAxisAcc(7070, "aoAxisAcc","Motion",0,100,1,0,7,70,0,32,true,"deg/s2",ConvertMemery<float, unsigned>,ConvertMemery<unsigned, float>);
+SystemData<float> aoAxisDec(7074, "aoAxisDec","Motion",0,100,1,0,7,74,0,32,true,"deg/s2",ConvertMemery<float, unsigned>,ConvertMemery<unsigned, float>);
+SystemData<float> aoAxisJerk(7078, "aoAxisJerk","Motion",0,100,1,0,7,78,0,32,true,"deg/s3",ConvertMemery<float, unsigned>,ConvertMemery<unsigned, float>);
+SystemData<float> aoAxisVelocity(7082, "aoAxisVelocity","Motion",0,100,1,0,7,82,0,32,true,"deg/s",ConvertMemery<float, unsigned>,ConvertMemery<unsigned, float>);
+SystemData<float> aoAxisPosition(7086, "aoAxisPosition","Motion",0,100,1,0,7,86,0,32,true,"deg",ConvertMemery<float, unsigned>,ConvertMemery<unsigned, float>);
+SystemData<float> aoAxisDistance(7090, "aoAxisDistance","Motion",0,100,1,0,7,90,0,32,true,"deg",ConvertMemery<float, unsigned>,ConvertMemery<unsigned, float>);
+SystemData<float> aoAxisVelOverride(7094, "aoAxisVelOverride","Motion",0,100,1,0,7,94,0,32,true,"deg/s",ConvertMemery<float, unsigned>,ConvertMemery<unsigned, float>);
+
+
+//DeviceNet
+SystemData<unsigned> aiAPCStatus(8000, "aiAPCStatus","DeviceNet",0,0,0,0,8,0,0,8,false);
+SystemData<float> aiAPCPressure(8001, "aiAPCPressure","DeviceNet",0,0,1,0,8,1,0,32,false,"torr",ConvertLinear<float,unsigned>(0, 23405, 0.0f, 1000.0f));
+SystemData<float> aiAPCPosition(8005, "aiAPCPosition","DeviceNet",0,0,1,0,8,5,0,16,false,"%",ConvertLinear<float,unsigned>(0, 32767, 0.0f, 100.0f));
+SystemData<unsigned> aiAPCOverrideStatus(8007, "aiAPCOverrideStatus","DeviceNet",0,0,0,0,8,7,0,8,false);
+SystemData<unsigned> aiVapMFCStatus(8008, "aiVapMFCStatus","DeviceNet",0,0,0,0,8,8,0,8,false);
+SystemData<float> aiEtOHFlowrate(8009, "aiEtOHFlowrate","DeviceNet",0,0,0,0,8,9,0,16,false,"sccm",ConvertLinear<float,unsigned>(0, 32767, 0.0f, 972.4f));
+SystemData<unsigned> aiHFMFCStatus(8011, "aiHFMFCStatus","DeviceNet",0,0,0,0,8,11,0,8,false);
+SystemData<float> aiHFFlowrate(8012, "aiHFFlowrate","DeviceNet",0,0,0,0,8,12,0,16,false,"sccm",ConvertLinear<float,unsigned>(0, 32767, 0.0f, 2670.0f));
+SystemData<unsigned> aiPurgeN2MFCStatus(8014, "aiPurgeN2MFCStatus","DeviceNet",0,0,0,0,8,14,0,8,false);
+SystemData<float> aiPurgeN2Flowrate(8015, "aiPurgeN2Flowrate","DeviceNet",0,0,0,0,8,15,0,16,false,"sccm",ConvertLinear<float,unsigned>(0, 32767, 0.0f, 6670.0f));
+SystemData<unsigned> aiN2MFCStatus(8017, "aiN2MFCStatus","DeviceNet",0,0,0,0,8,17,0,8,false);
+SystemData<float> aiN2Flowrate(8018, "aiN2Flowrate","DeviceNet",0,0,0,0,8,18,0,16,false,"sccm",ConvertLinear<float,unsigned>(0, 32767, 0.0f, 6670.0f));
+SystemData<float> aiProcChamPressure(8020, "aiProcChamPressure","DeviceNet",0,0,1,0,8,20,0,16,false,"torr",ConvertLinear<float,unsigned>(0, 23405, 0.0f, 1000.0f));
+SystemData<unsigned> aiProcChamManoStatus(8022, "aiProcChamManoStatus","DeviceNet",0,0,0,0,8,22,0,8,false);
+SystemData<float> aiExpChamPressure(8023, "aiExpChamPressure","DeviceNet",0,0,1,0,8,23,0,16,false,"torr",ConvertLinear<float,unsigned>(0, 23405, 0.0f, 1000.0f));
+SystemData<unsigned> aiExpChamManoStatus(8025, "aiExpChamManoStatus","DeviceNet",0,0,0,0,8,25,0,8,false);
+
+SystemData<float> aoAPCPressure(8026, "aoAPCPressure","DeviceNet",0,1000,1,0,8,26,0,16,true,"torr",ConvertLinear<float,unsigned>(0, 32767, 0.0f, 1000.0f),ConvertLinear<unsigned,float>(0.0f, 1000.0f, 0, 32767));
+SystemData<float> aoAPCPosition(8027, "aoAPCPosition","DeviceNet",0,7000,1,0,8,26,0,16,true,"%",ConvertLinear<float,unsigned>(0, 32767, 0.0f, 100.0f),ConvertLinear<unsigned,float>(0.0f, 100.0f, 0, 32767));
+SystemData<unsigned> aoAPCOverride(8028, "aoAPCOverride","DeviceNet",0,255,0,0,8,28,0,8,true);
+SystemData<unsigned> aoAPCControlMode(8029, "aoAPCControlMode","DeviceNet",0,255,0,0,8,29,0,8,true);
+SystemData<float> aoEtOHFlowSetpoint(8030, "aoEtOHFlowSetpoint","DeviceNet",0,700,0,0,8,30,0,16,true,"sccm",ConvertLinear<float,unsigned>(0, 24576, 0.0f, 729.3f),ConvertLinear<unsigned,float>(0.0f, 729.3f, 0, 24576));
+SystemData<float> aoHFFlowSetpoint(8032, "aoHFFlowSetpoint","DeviceNet",0,2000,0,0,8,32,0,16,true,"sccm",ConvertLinear<float,unsigned>(0, 24576, 0.0f, 2000.0f),ConvertLinear<unsigned,float>(0.0f, 2000.0f, 0, 24576));
+SystemData<float> aoPurgeN2FlowSetpoint(8034, "aoPurgeN2FlowSetpoint","DeviceNet",0,5000,0,0,8,34,0,16,true,"sccm",ConvertLinear<float,unsigned>(0, 24576, 0.0f, 5000.0f),ConvertLinear<unsigned,float>(0.0f, 5000.0f, 0, 24576));
+SystemData<float> aoN2FlowSetpoint(8036, "aoN2FlowSetpoint","DeviceNet",0,5000,0,0,8,36,0,16,true,"sccm",ConvertLinear<float,unsigned>(0, 24576, 0.0f, 5000.0f),ConvertLinear<unsigned,float>(0.0f, 5000.0f, 0, 24576));
+
+
 
 
 //user defined

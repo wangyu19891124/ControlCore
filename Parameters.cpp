@@ -14,28 +14,28 @@ namespace Parameters
 
 //define all needed parameters here
 //temperature
-ParameterItem<float> VaporizerTC1(1, "VaporizerTC1", "Temperature", "Vaporizer TC1", 0, 200, 20, "¡æ");
-ParameterItem<float> TC1WarnRange(2, "TC1WarnRange", "Temperature", "Warning range of TC1 temperature", 0, 200, 20, "¡æ");
-ParameterItem<float> TC1AlarmRange(3, "TC1AlarmRange", "Temperature", "Alarm range of TC1 temperature", 0, 200, 20, "¡æ");
-ParameterItem<float> VaporizerTC2(4, "VaporizerTC2", "Temperature", "Vaporizer TC2", 0, 200, 20, "¡æ");
-ParameterItem<float> TC2WarnRange(5, "TC2WarnRange", "Temperature", "Warning range of TC2 temperature", 0, 200, 20, "¡æ");
-ParameterItem<float> TC2AlarmRange(6, "TC2AlarmRange", "Temperature", "Alarm range of TC2 temperature", 0, 200, 20, "¡æ");
-ParameterItem<float> LidTemperature(7, "LidTemperature", "Temperature", "Chamber lid temperature", 0, 200, 20, "¡æ");
-ParameterItem<float> LidTempWarnRange(8, "LidTempWarnRange", "Temperature", "Warning range of chamber lid temperature", 0, 200, 20, "¡æ");
-ParameterItem<float> LidTempAlarmRange(9, "LidTempAlarmRange", "Temperature", "Alarm range of chamber lid temperature", 0, 200, 20, "¡æ");
-ParameterItem<float> ChuckTemperature(10, "ChuckTemperature", "Temperature", "Chamber chuck temperature", 0, 200, 20, "¡æ");
-ParameterItem<float> ChuckTempWarnRange(11, "ChuckTempWarnRange", "Temperature", "Warning range of chamber chuck temperature", 0, 200, 20, "¡æ");
-ParameterItem<float> ChuckTempAlarmRange(12, "ChuckTempAlarmRange", "Temperature", "Alarm range of chamber chuck temperature", 0, 200, 20, "¡æ");
-ParameterItem<float> ChamberTemperature(13, "ChamberTemperature", "Temperature", "Chamber temperature", 0, 200, 20, "¡æ");
-ParameterItem<float> ChamberTempWarnRange(14, "ChamberTempWarnRange", "Temperature", "Warning range of chamber temperature", 0, 200, 20, "¡æ");
-ParameterItem<float> ChamberTempAlarmRange(15, "ChamberTempAlarmRange", "Temperature", "Alarm range of chamber temperature", 0, 200, 20, "¡æ");
+ParameterItem<float> VaporizerTC1(1, "VaporizerTC1", "Temperature", "Vaporizer TC1", 0, 200, 20, "Cels");
+ParameterItem<float> TC1WarnRange(2, "TC1WarnRange", "Temperature", "Warning range of TC1 temperature", 0, 200, 20, "Cels");
+ParameterItem<float> TC1AlarmRange(3, "TC1AlarmRange", "Temperature", "Alarm range of TC1 temperature", 0, 200, 20, "Cels");
+ParameterItem<float> VaporizerTC2(4, "VaporizerTC2", "Temperature", "Vaporizer TC2", 0, 200, 20, "Cels");
+ParameterItem<float> TC2WarnRange(5, "TC2WarnRange", "Temperature", "Warning range of TC2 temperature", 0, 200, 20, "Cels");
+ParameterItem<float> TC2AlarmRange(6, "TC2AlarmRange", "Temperature", "Alarm range of TC2 temperature", 0, 200, 20, "Cels");
+ParameterItem<float> LidTemperature(7, "LidTemperature", "Temperature", "Chamber lid temperature", 0, 200, 20, "Cels");
+ParameterItem<float> LidTempWarnRange(8, "LidTempWarnRange", "Temperature", "Warning range of chamber lid temperature", 0, 200, 20, "Cels");
+ParameterItem<float> LidTempAlarmRange(9, "LidTempAlarmRange", "Temperature", "Alarm range of chamber lid temperature", 0, 200, 20, "Cels");
+ParameterItem<float> ChuckTemperature(10, "ChuckTemperature", "Temperature", "Chamber chuck temperature", 0, 200, 20, "Cels");
+ParameterItem<float> ChuckTempWarnRange(11, "ChuckTempWarnRange", "Temperature", "Warning range of chamber chuck temperature", 0, 200, 20, "Cels");
+ParameterItem<float> ChuckTempAlarmRange(12, "ChuckTempAlarmRange", "Temperature", "Alarm range of chamber chuck temperature", 0, 200, 20, "Cels");
+ParameterItem<float> ChamberTemperature(13, "ChamberTemperature", "Temperature", "Chamber temperature", 0, 200, 20, "Cels");
+ParameterItem<float> ChamberTempWarnRange(14, "ChamberTempWarnRange", "Temperature", "Warning range of chamber temperature", 0, 200, 20, "Cels");
+ParameterItem<float> ChamberTempAlarmRange(15, "ChamberTempAlarmRange", "Temperature", "Alarm range of chamber temperature", 0, 200, 20, "Cels");
 
 //position
-ParameterItem<float> ChuckPos1(1001,"WaferPos1","Position","wafer1 in chuck position",0,360,0,"¡ã");
-ParameterItem<float> ChuckPos2(1002,"WaferPos2","Position","wafer2 in chuck position",0,360,120,"¡ã");
-ParameterItem<float> ChuckPos3(1003,"WaferPos3","Position","wafer3 in chuck position",0,360,240,"¡ã");
-ParameterItem<float> ChuckHomeDegree(1004,"HomeDegree","Degree","chuck home degree",0,360,100,"¡ã");
-ParameterItem<float> ChuckSpinDegree(1005,"SpinDegree","Degree","chuck spin degree",0,360,100,"¡ã");
+ParameterItem<float> ChuckPos1(1001,"WaferPos1","Position","wafer1 in chuck position",0,360,0,"deg");
+ParameterItem<float> ChuckPos2(1002,"WaferPos2","Position","wafer2 in chuck position",0,360,120,"deg");
+ParameterItem<float> ChuckPos3(1003,"WaferPos3","Position","wafer3 in chuck position",0,360,240,"deg");
+ParameterItem<float> ChuckHomeDegree(1004,"HomeDegree","Degree","chuck home degree",0,360,100,"deg");
+ParameterItem<float> ChuckSpinDegree(1005,"SpinDegree","Degree","chuck spin degree",0,360,100,"deg");
 
 //Flow
 ParameterItem<float> EtohFlow(2001,"EtohFlowSet","Flow","Etoh flow value",0,1000,300,"sccm");
@@ -64,8 +64,8 @@ ParameterItem<int> PostEtchKeepTime(3009,"PurgeTime","PostEtch","Post Etch Purge
 
 
 ParameterItem<int> RotateSpeed(3010, "RotateSpeed", "Motion/Motor", "speed setpoint of rotor.", 0, 2000, 50, "rpm");
-ParameterItem<int> H2Flow(3011, "H2Flow", "Motion/Motor", "H2 flow rate.", 0, 500, 300, "L/min");
-ParameterItem<double> PlateTemperature(3012, "PlateTemperature", "Heater/Plate", "temperature of plate.", -10.0, 200, 20, "¡æ");
+ParameterItem<int> H2Flow(3011, "H2Flow", "Motion/Motor", "H2 flow rate.", 0, 500, 300, "sccm");
+ParameterItem<double> PlateTemperature(3012, "PlateTemperature", "Heater/Plate", "temperature of plate.", -10.0, 200, 20, "Cels");
 ParameterItem<std::string> EfemIP(3013, "IP", "System/Efem", "IP address of EFEM.", "192.168.0.100");
 
 }

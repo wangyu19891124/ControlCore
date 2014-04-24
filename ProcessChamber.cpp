@@ -139,8 +139,8 @@ void ProcessChamber::OnClean()
 	NEW_UNIT_STEP(clean, false)
 		ADD_STEP_COMMAND([]()
 		{	std::cout<<"clean command."<<std::endl;})
-		ADD_STEP_WAIT_CONDITION([=]()->bool
-		{	return Parameters::RotateSpeed>200;}, 2000, [=]()
-		{	EVT::WiferBroken.Report("A3");})
+//		ADD_STEP_WAIT_CONDITION([=]()->bool
+//		{	return Parameters::RotateSpeed>200;}, 2000, [=]()
+//		{	EVT::WiferBroken.Report("A3");})
 	END_UNIT_STEP
 }

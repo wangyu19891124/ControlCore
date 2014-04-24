@@ -12,29 +12,10 @@
 #include "Database.h"
 
 
-RecordItem::RecordItem(RecordItemID id, const std::string& name, unsigned interval, boost::function<float ()> f, bool enable)
-	: m_id(id), m_name(name), m_interval(interval), m_f(f), m_enable_flag(enable)
+RecordItem::RecordItem(RecordItemID id, const std::string& name, bool enable)
+	: m_id(id), m_name(name), m_enable_flag(enable)
 {
-	m_last_record_time = boost::chrono::system_clock::now();
 }
-//
-//RecordItem::RecordItem(const RecordItem& other)
-//	: RecordItem(other.m_id, other.m_name, other.m_interval, other.m_f, other.m_enable_flag)
-//{
-//
-//}
-
-//RecordItem& RecordItem::operator = (const RecordItem& rhs)
-//{
-//	m_id = rhs.m_id;
-//	m_name = rhs.m_name;
-//	m_interval = rhs.m_interval;
-//	m_f = rhs.m_f;
-//	m_enable_flag = rhs.m_enable_flag;
-//	m_last_record_time = rhs.m_last_record_time;
-//
-//	return *this;
-//}
 
 bool RecordItem::operator == (const RecordItem& rhs)
 {
@@ -56,7 +37,14 @@ void RecordItem::Disable()
 	m_enable_flag = false;
 }
 
-void RecordItem::Monitor()
+
+IntervalRecordItem::IntervalRecordItem(RecordItemID id, const std::string& name, unsigned interval, boost::function<float ()> f, bool enable)
+	: RecordItem(id, name, enable), m_interval(interval), m_f(f)
+{
+	m_last_record_time = boost::chrono::system_clock::now();
+}
+
+void IntervalRecordItem::Monitor()
 {
 	if(!m_enable_flag)
 		return;
@@ -69,6 +57,27 @@ void RecordItem::Monitor()
 		float data = m_f();
 		Database::Instance().RecordData(m_name, data);
 		m_last_record_time = system_clock::now();
+	}
+}
+
+
+SwitchRecordItem::SwitchRecordItem(RecordItemID id, const std::string& name, boost::function<unsigned ()> f, bool enable)
+	: RecordItem(id, name, enable), m_old_value(0), m_f(f)
+{
+}
+
+void SwitchRecordItem::Monitor()
+{
+	if(!m_enable_flag)
+		return;
+
+	using namespace boost::chrono;
+	unsigned value = m_f();
+	if(value != m_old_value)
+	{
+		//record data to database
+		Database::Instance().RecordData(m_name, value);
+		m_old_value = value;
 	}
 }
 

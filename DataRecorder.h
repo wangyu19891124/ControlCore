@@ -30,26 +30,51 @@ class RecordItem
 {
 public:
 	RecordItem() = delete;
-	RecordItem(RecordItemID id, const std::string& name, unsigned interval,
-			boost::function<float ()> f, bool enable = false);
+	RecordItem(RecordItemID id, const std::string& name, bool enable = false);
 	RecordItem(const RecordItem&) = delete;
-	~RecordItem() = default;
-
+	virtual ~RecordItem() = default;
 	RecordItem& operator = (const RecordItem&) = delete;
+
 	bool operator == (const RecordItem&);
+	RecordItemID GetID();
 	void Enable();
 	void Disable();
 
-	void Monitor();
-	RecordItemID GetID();
+	virtual void Monitor() = 0;
 
-private:
+protected:
 	RecordItemID m_id;
 	std::string m_name;
+	bool m_enable_flag;
+};
+
+class IntervalRecordItem : public RecordItem
+{
+public:
+	IntervalRecordItem(RecordItemID id, const std::string& name, unsigned interval,
+			boost::function<float ()> f, bool enable = false);
+	virtual ~IntervalRecordItem() = default;
+
+	virtual void Monitor();
+
+private:
 	unsigned m_interval;
 	boost::function<float ()> m_f;
 	boost::chrono::time_point<boost::chrono::system_clock> m_last_record_time;
-	bool m_enable_flag;
+};
+
+class SwitchRecordItem : public RecordItem
+{
+public:
+	SwitchRecordItem(RecordItemID id, const std::string& name,
+			boost::function<unsigned ()> f, bool enable = false);
+	virtual ~SwitchRecordItem() = default;
+
+	virtual void Monitor();
+
+private:
+	unsigned m_old_value;
+	boost::function<unsigned ()> m_f;
 };
 
 class DataRecorder : public SingletonT<DataRecorder>

@@ -51,6 +51,26 @@ T ConvertNot(T data)
 	return data ? 0 : 1;
 }
 
+template<typename T1, typename T2>
+class ConvertLinear
+{
+public:
+	ConvertLinear(T2 input_low, T2 input_high, T1 output_low, T1 output_high) : m_input_low(input_low),
+		m_input_high(input_high), m_output_low(output_low), m_output_high(output_high) {};
+
+	T1 operator()(T2 input)
+	{
+		double delt = 1.0*(m_output_high - m_output_low)/(m_input_high - m_input_low);
+		return (T1)((input - m_input_low)*delt + m_output_low);
+	}
+
+private:
+	T2 m_input_low;
+	T2 m_input_high;
+	T1 m_output_low;
+	T1 m_output_high;
+};
+
 class BaseSystemData
 {
 public:
@@ -108,6 +128,7 @@ public:
 			std::stringstream ss;
 			ss<<m_name<<" can't be written.";
 			LogWarning(ss.str());
+			return *this;
 		}
 
 		if(rhs<=m_max && rhs>=m_min && rhs!=m_data)

@@ -88,16 +88,11 @@ extern SystemData<unsigned> diCbRightDoorClose;
 extern SystemData<unsigned> diCbHFConAlarm;
 
 //DO
-extern SystemData<unsigned> doRedLight;
-extern SystemData<unsigned> doRedFlash;
-extern SystemData<unsigned> doYellowLight;
-extern SystemData<unsigned> doYellowFlash;
-extern SystemData<unsigned> doGreenLight;
-extern SystemData<unsigned> doGreenFlash;
-extern SystemData<unsigned> doBlueLight;
-extern SystemData<unsigned> doBlueFlash;
-extern SystemData<unsigned> doBuzzerWarn;
-extern SystemData<unsigned> doBuzzerAlarm;
+extern SystemData<unsigned> aoRedLight;
+extern SystemData<unsigned> aoYellowLight;
+extern SystemData<unsigned> aoGreenLight;
+extern SystemData<unsigned> aoBlueLight;
+extern SystemData<unsigned> aoBuzzer;
 extern SystemData<unsigned> doHeartbeat;
 extern SystemData<unsigned> doEnableVPump;
 extern SystemData<unsigned> doHFRequest;
@@ -133,30 +128,106 @@ extern SystemData<unsigned> doVacFastProcCbVal;
 extern SystemData<unsigned> doVacSlowProcCbVal;
 extern SystemData<unsigned> doPinDownVal;
 extern SystemData<unsigned> doCbGateVal;
-extern SystemData<unsigned> doHeartbeatIntlk;
-extern SystemData<unsigned> doMainVacIntlk;
-extern SystemData<unsigned> doGeneralIntlk;
-extern SystemData<unsigned> doCHEM1ReqIntlk;
-extern SystemData<unsigned> doResetLED;
-extern SystemData<unsigned> doHWIntlk;
-extern SystemData<unsigned> doN2PurgeGasIntlk;
-extern SystemData<unsigned> doMotionIntlk;
-extern SystemData<unsigned> doProcCbBodyHeatEnable;
-extern SystemData<unsigned> doProcCbLidHeatEnable;
-extern SystemData<unsigned> doCbCkHeatEnable;
 
-extern SystemData<unsigned> doCbMotorServoOn;
-extern SystemData<unsigned> doCbMotorAlarmRes;
 
 //AI
-extern SystemData<unsigned> aiFacVacPrs;
-extern SystemData<unsigned> aiExpCbVacPrs;
-extern SystemData<unsigned> aiAlcGasPrs;
-extern SystemData<unsigned> aiAlcTankGasPrs;
-extern SystemData<unsigned> aiHFSupplyPrs;
-extern SystemData<unsigned> aiEthGasLeak;
-extern SystemData<unsigned> aiGasHFConcen;
-extern SystemData<unsigned> aiCbHFConcen;
+extern SystemData<float> aiFacPressure;
+extern SystemData<float> aiExpPressure;
+extern SystemData<float> aiAlcPressure;
+extern SystemData<float> aiAlcTankPressure;
+extern SystemData<float> aiHFSupplyPressure;
+extern SystemData<float> aiAlcGasLeak;
+extern SystemData<float> aiHFGasboxPPM;
+extern SystemData<float> aiHFChamberPPM;
+
+
+//AO
+
+
+//Body Heater
+extern SystemData<float> aiBodyHTTemp;
+extern SystemData<unsigned> aiBodyHTErrCode;
+extern SystemData<unsigned> diBodyHTPowRdy;
+extern SystemData<unsigned> diBodyHTErr;
+extern SystemData<unsigned> doBodyHTEnable;
+extern SystemData<float> aoBodyHTTempSet;
+
+
+//Lid Heater
+extern SystemData<float> aiLidHTTemp;
+extern SystemData<unsigned> aiLidHTErrCode;
+extern SystemData<unsigned> diLidHTPowRdy;
+extern SystemData<unsigned> diLidHTErr;
+extern SystemData<unsigned> doLidHTEnable;
+extern SystemData<float> aoLidHTTempSet;
+
+
+//Chuck Heater
+extern SystemData<float> aiChuckHTTemp;
+extern SystemData<unsigned> aiChuckHTErrCode;
+extern SystemData<unsigned> diChuckHTPowRdy;
+extern SystemData<unsigned> diChuckHTErr;
+extern SystemData<unsigned> doChuckHTEnable;
+extern SystemData<float> aoChuckHTTempSet;
+
+
+//Motion
+extern SystemData<unsigned> diHomeSensor;
+extern SystemData<unsigned> diCWLimitStatus;
+extern SystemData<unsigned> diCCWLimitStatus;
+extern SystemData<unsigned> diReachPosition;
+extern SystemData<unsigned> diDriverAlarm;
+extern SystemData<unsigned> diAxisError;
+extern SystemData<unsigned> diAxisErrStop;
+extern SystemData<unsigned> diAxisDisabled;
+extern SystemData<unsigned> diAxisStandStill;
+extern SystemData<unsigned> diAxisMoving;
+extern SystemData<unsigned> diAxisNotMoving;
+extern SystemData<unsigned> aiAxisErrCode;
+extern SystemData<float> aiActualPosition;
+extern SystemData<float> aiActualVelocity;
+extern SystemData<unsigned> aoAxisControl;
+extern SystemData<unsigned> doAxisExecute;
+extern SystemData<unsigned> doAxisServoOn;
+extern SystemData<unsigned> doAxisReset;
+extern SystemData<float> aoAxisStopDec;
+extern SystemData<float> aoAxisStopJerk;
+extern SystemData<float> aoAxisAcc;
+extern SystemData<float> aoAxisDec;
+extern SystemData<float> aoAxisJerk;
+extern SystemData<float> aoAxisVelocity;
+extern SystemData<float> aoAxisPosition;
+extern SystemData<float> aoAxisDistance;
+extern SystemData<float> aoAxisVelOverride;
+
+
+//DeviceNet
+extern SystemData<unsigned> aiAPCStatus;
+extern SystemData<float> aiAPCPressure;
+extern SystemData<float> aiAPCPressure;
+extern SystemData<unsigned> aiAPCOverrideStatus;
+extern SystemData<unsigned> aiVapMFCStatus;
+extern SystemData<float> aiEtOHFlowrate;
+extern SystemData<unsigned> aiHFMFCStatus;
+extern SystemData<float> aiHFFlowrate;
+extern SystemData<unsigned> aiPurgeN2MFCStatus;
+extern SystemData<float> aiPurgeN2Flowrate;
+extern SystemData<unsigned> aiN2MFCStatus;
+extern SystemData<float> aiN2Flowrate;
+extern SystemData<float> aiProcChamPressure;
+extern SystemData<unsigned> aiProcChamManoStatus;
+extern SystemData<float> aiExpChamPressure;
+extern SystemData<unsigned> aiExpChamManoStatus;
+extern SystemData<float> aoAPCPressure;
+extern SystemData<float> aoAPCPosition;
+extern SystemData<unsigned> aoAPCOverride;
+extern SystemData<unsigned> aoAPCControlMode;
+extern SystemData<float> aoEtOHFlowSetpoint;
+extern SystemData<float> aoHFFlowSetpoint;
+extern SystemData<float> aoPurgeN2FlowSetpoint;
+extern SystemData<float> aoN2FlowSetpoint;
+
+
 //user defined
 extern SystemData<unsigned> flag;
 extern SystemData<std::string> RecipeName;

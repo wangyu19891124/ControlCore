@@ -10,6 +10,7 @@
 
 #include "Recipe.h"
 #include "Utility.h"
+#include "Event.h"
 
 using namespace boost::property_tree;
 
@@ -158,8 +159,8 @@ void Recipe::Load(const std::string& name)
 	}
 	catch(...)
 	{
-		//TODO::report system event
 		Reset();
+		EVT::LoadRecipeFailed.Report(name);
 	}
 }
 
@@ -181,8 +182,8 @@ void Recipe::LoadFromString(const std::string& name, const std::string& recipe)
 	}
 	catch(...)
 	{
-		//TODO::report system event
 		Reset();
+		EVT::LoadRecipeFailed.Report(name);
 	}
 }
 
