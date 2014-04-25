@@ -11,6 +11,7 @@
 #include <string>
 #include <sstream>
 #include <typeinfo>
+#include <iomanip>
 
 #include "boost/property_tree/ptree.hpp"
 #include "boost/function.hpp"
@@ -161,8 +162,10 @@ public:
 		ptree node;
 		node.add<int>("id", m_id);
 		{
+			std::stringstream ss;
+			ss<<std::fixed<<std::setfill('0')<<std::setprecision(m_precision)<<m_data;
 			boost::mutex::scoped_lock lock(m_mtx);
-			node.add<T>("value", m_data);
+			node.add("value", ss.str());
 			m_changed_flag = false;
 		}
 		pt.push_back(make_pair("", node));

@@ -10,8 +10,8 @@ SmartUnit::SmartUnit(int id, const std::string& name) :
 		m_id(id), m_name(name), m_hp(0), m_need_home(true), m_state(State_Idle),
 		m_pause_flag(false), m_step_name(""), m_can_retry(false)
 {
-	m_last_task = UnitTask{TASK_NONE, 0, 0};
-	m_task = UnitTask{TASK_NONE, 0, 0};
+	m_last_task = UnitTask{COMMAND_NONE, 0, 0};
+	m_task = UnitTask{COMMAND_NONE, 0, 0};
 }
 
 SmartUnit::~SmartUnit()
@@ -34,20 +34,62 @@ void SmartUnit::Terminate()
 
 void SmartUnit::Invoke(int cmd, unsigned param1, unsigned param2)
 {
-	if(!CanManualOperate())
+	//high priority command can be execute any time
+	if(cmd < COMMAND_DELIMITER)
+	{
+		switch(cmd)
+		{
+		case COMMAND_ONLINE:
+			Online(param1);
+			break;
+		case COMMAND_OFFLINE:
+			Offline();
+			break;
+		case COMMAND_RETRY:
+			Retry();
+			break;
+		case COMMAND_ABORT:
+			Abort();
+			break;
+		case COMMAND_PAUSE:
+			Pause();
+			break;
+		case COMMAND_RESUME:
+			Resume();
+			break;
+		}
 		return;
+	}
 
-	TranslateTask(UnitTask{cmd, param1, param2});
+	if(!CanManualOperate())
+	{
+		Notify("Unit is busy or online, operation is aborted.");
+		return;
+	}
+
+	if((m_need_home && cmd == COMMAND_HOME) || !m_need_home)
+	{
+		Translate(UnitTask{cmd, param1, param2});
+	}
+	else
+	{
+		Notify("Homing is needed before doing other operation.");
+	}
 }
 
 void SmartUnit::Online(int hp)
 {
-	boost::mutex::scoped_lock lock(m_mtx);
+	if(m_need_home)
+	{
+		Notify("Homing is needed before put unit online.");
+		return;
+	}
+	boost::recursive_mutex::scoped_lock lock(m_mtx);
 	m_hp = hp;
 }
 void SmartUnit::Offline()
 {
-	boost::mutex::scoped_lock lock(m_mtx);
+	boost::recursive_mutex::scoped_lock lock(m_mtx);
 	m_hp = 0;
 }
 
@@ -55,7 +97,7 @@ void SmartUnit::Retry()
 {
 	if (m_state == State_Error && m_can_retry)
 	{
-		boost::mutex::scoped_lock lock(m_mtx);
+		boost::recursive_mutex::scoped_lock lock(m_mtx);
 		m_cur_step->Reset();
 		m_state = State_Running;
 	}
@@ -66,7 +108,7 @@ void SmartUnit::Abort()
 	if (m_state != State_Error)
 		return;
 
-	boost::mutex::scoped_lock lock(m_mtx);
+	boost::recursive_mutex::scoped_lock lock(m_mtx);
 	m_cur_step.reset();
 	m_steps.clear();
 	m_step_name = "";
@@ -76,19 +118,14 @@ void SmartUnit::Abort()
 	m_state = State_Idle;
 }
 
-//void SmartUnit::Home()
-//{
-//	//subclass should call __base::Home at end
-//	m_need_home = false;
-//}
-
+//do nothing, not support
 void SmartUnit::Pause()
 {
-	if (m_state == State_Error)
-		return;
+//	if (m_state == State_Error)
+//		return;
 
-	if (CanPause())
-		m_pause_flag = true;
+//	if (CanPause())
+//		m_pause_flag = true;
 }
 
 void SmartUnit::Resume()
@@ -96,26 +133,25 @@ void SmartUnit::Resume()
 	m_pause_flag = false;
 }
 
-bool SmartUnit::TranslateTask(const UnitTask& task)
+void SmartUnit::Translate(const UnitTask& task)
 {
-	if (m_task.type != TASK_NONE && task.type != m_task.type)
+	if (m_task.command != COMMAND_NONE && task.command != m_task.command)
 		m_last_task = m_task;
 
 	m_task = task;
 
-	if (task.type == TASK_NONE)
-		return false;
+	if (task.command == COMMAND_NONE)
+		return;
 
 	{
-		boost::mutex::scoped_lock lock(m_mtx);
+		boost::recursive_mutex::scoped_lock lock(m_mtx);
 		if(m_hp>0)
 		{
 			m_hp--;
 		}
 	}
 
-	return true;
-	//subclass implement in the following
+	TranslateTask(task);
 }
 
 void SmartUnit::work_fun()
@@ -139,7 +175,7 @@ void SmartUnit::work_fun()
 					if (m_hp > 0)
 					{
 						UnitTask task = GetNextTask();
-						TranslateTask(task);
+						Translate(task);
 					}
 				}
 			}
@@ -154,7 +190,7 @@ void SmartUnit::work_fun()
 
 			if (!m_pause_flag && !m_cur_step)
 			{
-				boost::mutex::scoped_lock lock(m_mtx);
+				boost::recursive_mutex::scoped_lock lock(m_mtx);
 				m_cur_step = *(m_steps.begin());
 				m_steps.pop_front();
 				m_step_name = m_cur_step->GetName();
@@ -196,30 +232,35 @@ void SmartUnit::work_fun()
 	std::cout<<"smart unit thread exit!"<<std::endl;
 }
 
-bool SmartUnit::CanPause()
-{
-	switch (m_task.type)
-	{
-	case TASK_PROCESS:
-	case TASK_CLEAN:
-	case TASK_LOAD:
-	case TASK_UNLOAD:
-		return false;
-	default:
-		return true;
-	}
-
-	return true;
-}
+//bool SmartUnit::CanPause()
+//{
+//	switch (m_task.command)
+//	{
+//	case COMMAND_PROCESS:
+//	case COMMAND_CLEAN:
+//	case COMMAND_LOAD:
+//	case COMMAND_UNLOAD:
+//		return false;
+//	default:
+//		return true;
+//	}
+//
+//	return true;
+//}
 
 bool SmartUnit::CanManualOperate()
 {
 	if(m_hp > 0 || m_state != State_Idle)
 		return false;
 
-	boost::mutex::scoped_lock lock(m_mtx);
+	boost::recursive_mutex::scoped_lock lock(m_mtx);
 	if(!m_steps.empty())
 		return false;
 
 	return true;
+}
+void SmartUnit::HomeComplete()
+{
+	boost::recursive_mutex::scoped_lock lock(m_mtx);
+	m_need_home = false;
 }

@@ -232,6 +232,11 @@ extern SystemData<float> aoN2FlowSetpoint;
 extern SystemData<unsigned> flag;
 extern SystemData<std::string> RecipeName;
 
+extern SystemData<unsigned> RecipeTotalTime;
+extern SystemData<unsigned> RecipeElapseTime;
+extern SystemData<unsigned> WaferCount;
+extern SystemData<std::string> LeakTestResult;
+extern SystemData<float> LeakRate;
 };
 
 #endif /* DATA_H_ */

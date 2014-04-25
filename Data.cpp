@@ -232,5 +232,12 @@ SystemData<float> aoN2FlowSetpoint(8036, "aoN2FlowSetpoint","DeviceNet",0,5000,0
 //user defined
 SystemData<unsigned> flag(100011, "flag", "UserDefine", 0, 1000);
 SystemData<std::string> RecipeName(100013, "RecipeName", "UserDefine");
+SystemData<unsigned> RecipeTotalTime(100014, "RecipeTotalTime", "UserDefine", 0, 1000, 0, "s");
+SystemData<unsigned> RecipeElapseTime(100015, "RecipeElapseTime", "UserDefine", 0, 1000, 0, "s");
+
+SystemData<unsigned> WaferCount(100021, "WaferCount", "UserDefine", 0, 1000);
+
+SystemData<std::string> LeakTestResult(100030, "LeakTestResult", "UserDefine");
+SystemData<float> LeakRate(100031, "LeakRate", "UserDefine", 0, 1000, 2, "torr/min");
 
 }

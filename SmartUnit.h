@@ -20,24 +20,29 @@ enum UnitState
 	State_Error,
 };
 
-#define	TASK_NONE 0
-#define	TASK_HOME 1
-#define	TASK_LOAD 2
-#define	TASK_UNLOAD 3
-#define	TASK_PROCESS 4
-#define	TASK_CLEAN 5
-#define	TASK_ALIGN 6
-#define TASK_PUMP 7
-#define TASK_VENT 8
-#define TASK_PURGE 9
+#define COMMAND_ONLINE 0
+#define COMMAND_OFFLINE 1
+#define COMMAND_RETRY 2
+#define COMMAND_ABORT 3
+#define COMMAND_PAUSE 4
+#define COMMAND_RESUME 5
+
+#define COMMAND_DELIMITER 1000
+#define	COMMAND_NONE 1000
+#define	COMMAND_HOME 1001
+#define	COMMAND_LOAD 1002
+#define	COMMAND_UNLOAD 1003
+#define	COMMAND_PROCESS 1004
+#define	COMMAND_CLEAN 1005
+#define	COMMAND_ALIGN 1006
+#define COMMAND_PUMP 1007
+#define COMMAND_VENT 1008
+#define COMMAND_PURGE 1009
 
 
 struct UnitTask
 {
-//	UnitTask(){UnitTask(Task_None, 0, 0);}
-//	UnitTask(TaskType t):type(t), para1(0), para2(0){}
-//	UnitTask(TaskType t, int p1, int p2):type(t), para1(p1), para2(p2){}
-	int type;
+	int command;
 	unsigned para1;
 	unsigned para2;
 };
@@ -52,25 +57,31 @@ public:
 public:
 	virtual void Initialize();
 	virtual void Terminate();
+	void Invoke(int cmd, unsigned param1, unsigned param2);
+
+protected:
 	void Online(int hp = __INT_MAX__);
 	void Offline();
 	void Retry();
 	void Abort();
 	void Pause();
 	void Resume();
-//	virtual void Home();
-	void Invoke(int cmd, unsigned param1, unsigned param2);
 
 protected:
 	virtual UnitTask GetNextTask() = 0;
 	virtual void UpdateUnitInfo() = 0;
 	virtual void SafeHandle() = 0;
-	virtual bool TranslateTask(const UnitTask& task);
+	virtual void TranslateTask(const UnitTask& task) = 0;
+	virtual void Notify(const std::string& msg) = 0;
 
 private:
 	void work_fun();
-	bool CanPause();
+//	bool CanPause();
 	bool CanManualOperate();
+	void Translate(const UnitTask& task);
+
+protected:
+	void HomeComplete();
 
 protected:
 	int m_id;
@@ -84,7 +95,7 @@ protected:
 	UnitTask m_task;
 	UnitTask m_last_task;
 	boost::scoped_ptr<boost::thread> m_thrd;
-	boost::mutex m_mtx;
+	boost::recursive_mutex m_mtx;
 	std::list<boost::shared_ptr<TaskStep> > m_steps;
 	boost::shared_ptr<TaskStep> m_cur_step;
 
@@ -92,15 +103,16 @@ protected:
 
 
 #define NEW_UNIT_STEP(name, retry) { \
-	boost::shared_ptr<TaskStep> step(new TaskStep(#name, retry)); \
-	boost::mutex::scoped_lock lock(m_mtx);
+	boost::shared_ptr<TaskStep> step(new TaskStep(#name, retry));
+
 
 #define ADD_STEP_COMMAND(func) step->Add(Command(func));
 #define ADD_STEP_WAIT_CONDITION(cond, timeout, evt) step->Add(WaitCondition(cond, timeout, evt));
 #define ADD_STEP_WAIT(timeout) step->Add(Wait(timeout));
 #define ADD_STEP_EXPECT(cond, duration, evt) step->Add(Expect(cond, duration, evt));
 
-#define END_UNIT_STEP m_steps.push_back(step); \
+#define END_UNIT_STEP boost::recursive_mutex::scoped_lock lock(m_mtx); \
+	m_steps.push_back(step); \
 	}
 
 
