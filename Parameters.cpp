@@ -30,43 +30,37 @@ ParameterItem<float> ChamberTemperature(13, "ChamberTemperature", "Temperature",
 ParameterItem<float> ChamberTempWarnRange(14, "ChamberTempWarnRange", "Temperature", "Warning range of chamber temperature", 0, 200, 20, "Cels");
 ParameterItem<float> ChamberTempAlarmRange(15, "ChamberTempAlarmRange", "Temperature", "Alarm range of chamber temperature", 0, 200, 20, "Cels");
 
-//position
-ParameterItem<float> ChuckPos1(1001,"WaferPos1","Position","wafer1 in chuck position",0,360,0,"deg");
-ParameterItem<float> ChuckPos2(1002,"WaferPos2","Position","wafer2 in chuck position",0,360,120,"deg");
-ParameterItem<float> ChuckPos3(1003,"WaferPos3","Position","wafer3 in chuck position",0,360,240,"deg");
-ParameterItem<float> ChuckHomeDegree(1004,"HomeDegree","Degree","chuck home degree",0,360,100,"deg");
-ParameterItem<float> ChuckSpinDegree(1005,"SpinDegree","Degree","chuck spin degree",0,360,100,"deg");
+//Chuck position
+ParameterItem<float> ChuckPos1(1001,"ChuckPos1","Chuck","chuck position1",0,360,0,"deg");
+ParameterItem<float> ChuckPos2(1002,"ChuckPos2","Chuck","chuck position2",0,360,120,"deg");
+ParameterItem<float> ChuckPos3(1003,"ChuckPos3","Chuck","chuck position3",0,360,240,"deg");
+ParameterItem<float> ChuckPatrolStart(1004,"ChuckPatrolStart","Chuck","chuck patrol start degree",0,360,0,"deg");
+ParameterItem<float> ChuckPatrolEnd(1005,"ChuckPatrolEnd","Chuck","chuck patrol end degree",0,360,360,"deg");
 
 //Flow
-ParameterItem<float> EtohFlow(2001,"EtohFlowSet","Flow","Etoh flow value",0,1000,300,"sccm");
-ParameterItem<float> EtohFlowWarn(2002,"EtohFlowWarn","Flow","Etoh flow warn value",0,1000,500,"sccm");
-ParameterItem<float> EtohFlowAlarm(2003,"EtohFlowAlm","Flow","Etoh flow alarm value",0,1000,800,"sccm");
-ParameterItem<float> HFFlow(2004,"HFFlowSet","Flow","HF flow value",0,1000,300,"sccm");
-ParameterItem<float> HFFlowWarn(2005,"HFFlowWarn","Flow","HF flow warn value",0,1000,500,"sccm");
-ParameterItem<float> HFFlowAlarm(2006,"HFFlowAlm","Flow","HF flow alarm value",0,1000,800,"sccm");
-ParameterItem<float> CAN2Flow(2007,"CAN2FlowSet","Flow","CAN2 flow value",0,1000,300,"sccm");
-ParameterItem<float> CAN2FlowWarn(2008,"CAN2FlowWarn","Flow","CAN2 flow warn value",0,1000,500,"sccm");
-ParameterItem<float> CAN2FlowAlarm(2009,"CAN2FlowAlm","Flow","CAN2 flow alarm value",0,1000,800,"sccm");
-ParameterItem<float> PGN2Flow(2010,"PGN2FlowSet","Flow","PGN2 flow value",0,1000,300,"sccm");
-ParameterItem<float> PGN2FlowWarn(2011,"PGN2FlowWarn","Flow","PGN2 flow warn value",0,1000,500,"sccm");
-ParameterItem<float> PGN2FlowAlarm(2012,"PGN2FlowAlm","Flow","PGN2 flow alarm value",0,1000,800,"sccm");
+ParameterItem<unsigned> EtOHFlow(2001,"EtOHFlow","Flow","Etoh flow value",0,1000,300,"sccm");
+ParameterItem<unsigned> EtOHFlowWarn(2002,"EtOHFlowWarn","Flow","Etoh flow warn value",0,1000,500,"sccm");
+ParameterItem<unsigned> EtOHFlowAlarm(2003,"EtOHFlowAlarm","Flow","Etoh flow alarm value",0,1000,800,"sccm");
+ParameterItem<unsigned> HFFlow(2004,"HFFlow","Flow","HF flow value",0,1000,300,"sccm");
+ParameterItem<unsigned> HFFlowWarn(2005,"HFFlowWarn","Flow","HF flow warn value",0,1000,500,"sccm");
+ParameterItem<unsigned> HFFlowAlarm(2006,"HFFlowAlarm","Flow","HF flow alarm value",0,1000,800,"sccm");
+ParameterItem<unsigned> N2Flow(2007,"N2Flow","Flow","N2 flow value",0,1000,300,"sccm");
+ParameterItem<unsigned> N2FlowWarn(2008,"N2FlowWarn","Flow","N2 flow warn value",0,1000,500,"sccm");
+ParameterItem<unsigned> N2FlowAlarm(2009,"N2FlowAlarm","Flow","N2 flow alarm value",0,1000,800,"sccm");
+ParameterItem<unsigned> PurgeN2Flow(2010,"PurgeN2Flow","Flow","Purge N2 flow value",0,1000,300,"sccm");
+ParameterItem<unsigned> PurgeN2FlowWarn(2011,"PurgeN2FlowWarn","Flow","Purge N2 flow warn value",0,1000,500,"sccm");
+ParameterItem<unsigned> PurgeN2FlowAlarm(2012,"PurgeN2FlowAlarm","Flow","Purge N2 flow alarm value",0,1000,800,"sccm");
 
 //Process
-ParameterItem<float> ChamCommPressure(3001,"ChamCommPre","Pressure","ChamberCommPressure setting value",0,500,100,"torr");
-ParameterItem<float> ChamCommPressureWarn(3002,"ChamCommPreWarn","Pressure","ChamberCommPressure warning value",0,500,300,"torr");
-ParameterItem<float> ChamCommPressureAlm(3003,"ChamCommPreAlm","Pressure","ChamberCommPressure alarm value",0,500,400,"torr");
-ParameterItem<float> WaferPinUpTime(3004,"WaferPinTime","Time","Pin up lift Time Out value",0,100,10,"s");
-ParameterItem<float> PostEtchN2Flow(3005,"N2Flow","PostEtch","Post Etch N2 Flow Setting",0,800,300,"sccm");
-ParameterItem<float> PostEtchN2Pressure(3006,"N2Pressure","PostEtch","Post Etch N2 Presssure",0,800,200,"torr");
-ParameterItem<float> PostEtchN2LowerPre(3007,"N2PreLower","PostEtch","Post Etch N2 Purge lower Pressure",0,800,100,"torr");
-ParameterItem<int> PostEtchPGNum(3008,"PurgeNum","PostEtch","Post Etch Purge Times",0,100,10,"num");
-ParameterItem<int> PostEtchKeepTime(3009,"PurgeTime","PostEtch","Post Etch Purge Keep Time",0,300,10,"s");
-
-
-ParameterItem<int> RotateSpeed(3010, "RotateSpeed", "Motion/Motor", "speed setpoint of rotor.", 0, 2000, 50, "rpm");
-ParameterItem<int> H2Flow(3011, "H2Flow", "Motion/Motor", "H2 flow rate.", 0, 500, 300, "sccm");
-ParameterItem<double> PlateTemperature(3012, "PlateTemperature", "Heater/Plate", "temperature of plate.", -10.0, 200, 20, "Cels");
-ParameterItem<std::string> EfemIP(3013, "IP", "System/Efem", "IP address of EFEM.", "192.168.0.100");
+ParameterItem<float> ChamCommPressure(3001,"ChamCommPressure","Pressure","ChamberCommPressure setting value",0,500,100,"torr");
+ParameterItem<float> ChamCommPressureWarn(3002,"ChamCommPressureWarn","Pressure","ChamberCommPressure warning value",0,500,300,"torr");
+ParameterItem<float> ChamCommPressureAlarm(3003,"ChamCommPressureAlarm","Pressure","ChamberCommPressure alarm value",0,500,400,"torr");
+ParameterItem<float> WaferPinUpTime(3004,"WaferPinUpTime","Time","Pin up lift Time Out value",0,100,10,"s");
+ParameterItem<float> PostEtchN2Flow(3005,"PostEtchN2Flow","PostEtch","Post Etch N2 Flow Setting",0,800,300,"sccm");
+ParameterItem<float> PostEtchN2Pressure(3006,"PostEtchN2Pressure","PostEtch","Post Etch N2 Presssure",0,800,200,"torr");
+ParameterItem<float> PostEtchN2LowerPre(3007,"PostEtchN2LowerPre","PostEtch","Post Etch N2 Purge lower Pressure",0,800,100,"torr");
+ParameterItem<int> PostEtchPurgeTimes(3008,"PostEtchPurgeTimes","PostEtch","Post Etch Purge Times",0,100,10,"times");
+ParameterItem<int> PostEtchKeepTime(3009,"PostEtchKeepTime","PostEtch","Post Etch Purge Keep Time",0,300,10,"s");
 
 }
 

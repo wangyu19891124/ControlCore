@@ -12,6 +12,7 @@
 #include "Interlock.h"
 #include "DataRecorder.h"
 #include "RecipeManager.h"
+#include "UnitManager.h"
 
 extern "C" void Initialize()
 {
@@ -25,10 +26,12 @@ extern "C" void Initialize()
 	DataRecorder::Instance().Initialize();
 	WaferManager::Instance().Initialize();
 	RecipeManager::Instance().Initialize();
+	UnitManager::Instance().Initialize();
 }
 
 extern "C" void Terminate()
 {
+	UnitManager::Instance().Terminate();
 	RecipeManager::Instance().Terminate();
 	WaferManager::Instance().Terminate();
 	DataRecorder::Instance().Terminate();
@@ -150,7 +153,11 @@ extern "C" int FetchRecentEventLog(char* json, unsigned buffer_size)
 
 extern "C" void Invoke(int unit, int cmd, unsigned param1, unsigned param2)
 {
+	std::stringstream ss;
+	ss<<"invoke: ["<<unit<<", "<<cmd<<", "<<param1<<", "<<param2<<"].";
+	LogInfo(ss.str());
 
+	UnitManager::Instance().Invoke(unit, cmd, param1, param2);
 }
 
 extern "C" void LoadRecipe(const char* name)

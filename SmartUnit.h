@@ -38,6 +38,8 @@ enum UnitState
 #define COMMAND_PUMP 1007
 #define COMMAND_VENT 1008
 #define COMMAND_PURGE 1009
+#define COMMAND_PIN_UPDOWN 1010
+#define COMMAND_LEAKCHECK 1011
 
 
 struct UnitTask
