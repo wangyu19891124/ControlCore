@@ -22,6 +22,13 @@ void WaferManager::Terminate()
 
 }
 
+void WaferManager::CreateWafer(int unit, unsigned short slot, const std::string& id, WaferSize size, WaferType type)
+{
+	int index = unit*100 + slot;
+	boost::mutex::scoped_lock lock(m_mtx);
+	m_wafers[index] = boost::shared_ptr<Wafer>(new Wafer(id, unit, slot, size, type));
+}
+
 void WaferManager::CreateWafer(int unit, const std::string& casset_id, WaferSize size, WaferType type, unsigned int mapping)
 {
 	mapping = mapping & DEFAULT_FOUP_MAPPING;

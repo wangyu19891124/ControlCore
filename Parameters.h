@@ -6,23 +6,14 @@
 namespace Parameters
 {
 
-
+//define all needed parameters here
 //temperature
-extern ParameterItem<float> VaporizerTC1;
-extern ParameterItem<float> TC1WarnRange;
-extern ParameterItem<float> TC1AlarmRange;
-extern ParameterItem<float> VaporizerTC2;
-extern ParameterItem<float> TC2WarnRange;
-extern ParameterItem<float> TC2AlarmRange;
-extern ParameterItem<float> LidTemperature;
-extern ParameterItem<float> LidTempWarnRange;
-extern ParameterItem<float> LidTempAlarmRange;
-extern ParameterItem<float> ChuckTemperature;
-extern ParameterItem<float> ChuckTempWarnRange;
-extern ParameterItem<float> ChuckTempAlarmRange;
-extern ParameterItem<float> ChamberTemperature;
-extern ParameterItem<float> ChamberTempWarnRange;
-extern ParameterItem<float> ChamberTempAlarmRange;
+extern ParameterItem<float> LidTemp;
+extern ParameterItem<float> BodyTemp;
+extern ParameterItem<float> ChuckTemp;
+extern ParameterItem<float> TempWarnOffset;
+extern ParameterItem<float> TempAlarmOffset;
+
 
 //Chuck position
 extern ParameterItem<float> ChuckPos1;
@@ -30,6 +21,7 @@ extern ParameterItem<float> ChuckPos2;
 extern ParameterItem<float> ChuckPos3;
 extern ParameterItem<float> ChuckPatrolStart;
 extern ParameterItem<float> ChuckPatrolEnd;
+
 
 //Flow
 extern ParameterItem<unsigned> EtOHFlow;
@@ -45,17 +37,36 @@ extern ParameterItem<unsigned> PurgeN2Flow;
 extern ParameterItem<unsigned> PurgeN2FlowWarn;
 extern ParameterItem<unsigned> PurgeN2FlowAlarm;
 
-//Process
-extern ParameterItem<float> ChamCommPressure;
-extern ParameterItem<float> ChamCommPressureWarn;
-extern ParameterItem<float> ChamCommPressureAlarm;
-extern ParameterItem<float> WaferPinUpTime;
-extern ParameterItem<float> PostEtchN2Flow;
-extern ParameterItem<float> PostEtchN2Pressure;
-extern ParameterItem<float> PostEtchN2LowerPre;
-extern ParameterItem<int> PostEtchPurgeTimes;
-extern ParameterItem<int> PostEtchKeepTime;
 
+//Pressure
+extern ParameterItem<float> ATMPressure;
+extern ParameterItem<float> VacuumPressure;
+
+
+//Purge
+extern ParameterItem<float> N2PurgeFlow;
+extern ParameterItem<unsigned> PurgeRepeatTimes;
+extern ParameterItem<float> PurgeTargetPressure;
+extern ParameterItem<unsigned> FlushTime;
+extern ParameterItem<unsigned> FlushFlowrate;
+extern ParameterItem<unsigned> PurgeHoldTime;
+extern ParameterItem<unsigned> PumpHoldTime;
+
+
+//Valve
+extern ParameterItem<unsigned> GateValveTimeout;
+
+
+//Motion
+extern ParameterItem<unsigned> WaferPinTimeout;
+extern ParameterItem<unsigned> RotateTimeout;
+extern ParameterItem<unsigned> HomingTimeout;
+
+//Pump
+extern ParameterItem<float> FastSlowSwitchPressure;
+extern ParameterItem<float> PumpDownTargetPressure;
+extern ParameterItem<unsigned> SlowPumpTimeout;
+extern ParameterItem<unsigned> FastPumpTimeout;
 
 }
 

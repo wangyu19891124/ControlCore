@@ -240,5 +240,6 @@ SystemData<unsigned> WaferCount(100021, "WaferCount", "UserDefine", 0, 1000);
 SystemData<std::string> LeakCheckResult(100030, "LeakCheckResult", "UserDefine");
 SystemData<float> LeakRate(100031, "LeakRate", "UserDefine", 0, 1000, 2, "torr/min");
 SystemData<unsigned> LeakCheckState(100032, "LeakCheckState", "UserDefine", 0, 1);
+SystemData<std::string> LeakCheckStateText(100033, "LeakCheckStateText", "UserDefine");
 
 }

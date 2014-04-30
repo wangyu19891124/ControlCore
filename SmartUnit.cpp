@@ -35,6 +35,7 @@ void SmartUnit::Terminate()
 void SmartUnit::Invoke(int cmd, unsigned param1, unsigned param2)
 {
 	//high priority command can be execute any time
+	boost::recursive_mutex::scoped_lock lock(m_mtx);
 	if(cmd < COMMAND_DELIMITER)
 	{
 		switch(cmd)
@@ -84,12 +85,15 @@ void SmartUnit::Online(int hp)
 		Notify("Homing is needed before put unit online.");
 		return;
 	}
-	boost::recursive_mutex::scoped_lock lock(m_mtx);
+	if(!OnlinePrecheck())
+	{
+		return;
+	}
+
 	m_hp = hp;
 }
 void SmartUnit::Offline()
 {
-	boost::recursive_mutex::scoped_lock lock(m_mtx);
 	m_hp = 0;
 }
 
@@ -97,7 +101,6 @@ void SmartUnit::Retry()
 {
 	if (m_state == State_Error && m_can_retry)
 	{
-		boost::recursive_mutex::scoped_lock lock(m_mtx);
 		m_cur_step->Reset();
 		m_state = State_Running;
 	}
@@ -105,17 +108,18 @@ void SmartUnit::Retry()
 
 void SmartUnit::Abort()
 {
-	if (m_state != State_Error)
-		return;
+//	if (m_state != State_Error)
+//		return;
 
-	boost::recursive_mutex::scoped_lock lock(m_mtx);
 	m_cur_step.reset();
 	m_steps.clear();
 	m_step_name = "";
 	m_can_retry = false;
 	m_hp = 0;
-	m_need_home = true;
+	//m_need_home = true;
 	m_state = State_Idle;
+
+	OnAbort();
 }
 
 //do nothing, not support
@@ -130,7 +134,7 @@ void SmartUnit::Pause()
 
 void SmartUnit::Resume()
 {
-	m_pause_flag = false;
+//	m_pause_flag = false;
 }
 
 void SmartUnit::Translate(const UnitTask& task)
@@ -144,7 +148,6 @@ void SmartUnit::Translate(const UnitTask& task)
 		return;
 
 	{
-		boost::recursive_mutex::scoped_lock lock(m_mtx);
 		if(m_hp>0)
 		{
 			m_hp--;
@@ -161,66 +164,71 @@ void SmartUnit::work_fun()
 
 	while (true)
 	{
-		if (m_state == State_Idle)
 		{
-			if (!m_pause_flag)
+			boost::recursive_mutex::scoped_lock lock(m_mtx);
+			if (m_state == State_Idle)
 			{
-				if (m_steps.size() > 0)
+				if (!m_pause_flag)
 				{
-					m_state = State_Running;
-					continue;
-				}
-				else
-				{
-					if (m_hp > 0)
+					if (m_steps.size() > 0)
 					{
-						UnitTask task = GetNextTask();
-						Translate(task);
+						m_state = State_Running;
+						continue;
+					}
+					else
+					{
+						if (m_hp > 0)
+						{
+							UnitTask task = GetNextTask();
+							Translate(task);
+						}
 					}
 				}
 			}
-		}
-		else if (m_state == State_Running)
-		{
-			if (!m_cur_step && m_steps.empty())
+			else if (m_state == State_Running)
 			{
-				m_state = State_Idle;
-				continue;
-			}
-
-			if (!m_pause_flag && !m_cur_step)
-			{
-				boost::recursive_mutex::scoped_lock lock(m_mtx);
-				m_cur_step = *(m_steps.begin());
-				m_steps.pop_front();
-				m_step_name = m_cur_step->GetName();
-				m_can_retry = m_cur_step->CanRetry();
-			}
-
-			if (m_cur_step)
-			{
-				int rtv = m_cur_step->Execute();
-				std::cout<<"execute result: "<<rtv<<std::endl;
-				if (rtv == RESULT_OK)
+				if (!m_cur_step && m_steps.empty())
 				{
-					m_step_name = "";
-					m_can_retry = false;
-					m_cur_step.reset();
+					m_state = State_Idle;
+					continue;
 				}
-				else if (rtv == RESULT_FAILED)
+
+				if (!m_cur_step)
 				{
-					SafeHandle();
-					m_state = State_Error;
+					if(!m_steps.empty())
+					{
+						m_cur_step = *(m_steps.begin());
+						m_steps.pop_front();
+						m_step_name = m_cur_step->GetName();
+						m_can_retry = m_cur_step->CanRetry();
+					}
+				}
+
+				if (m_cur_step)
+				{
+					int rtv = m_cur_step->Execute();
+					std::cout<<"execute result: "<<rtv<<std::endl;
+					if (rtv == RESULT_OK)
+					{
+						m_step_name = "";
+						m_can_retry = false;
+						m_cur_step.reset();
+					}
+					else if (rtv == RESULT_FAILED)
+					{
+						SafeHandle();
+						m_state = State_Error;
+					}
 				}
 			}
-		}
-		else
-		{
-			//error state, do nothing
-		}
+			else
+			{
+				//error state, do nothing
+			}
 
-		//update unit information
-		UpdateUnitInfo();
+			//update unit information
+			UpdateUnitInfo();
+		}
 
 		if (boost::this_thread::interruption_requested())
 			break;
@@ -253,7 +261,6 @@ bool SmartUnit::CanManualOperate()
 	if(m_hp > 0 || m_state != State_Idle)
 		return false;
 
-	boost::recursive_mutex::scoped_lock lock(m_mtx);
 	if(!m_steps.empty())
 		return false;
 
@@ -261,6 +268,5 @@ bool SmartUnit::CanManualOperate()
 }
 void SmartUnit::HomeComplete()
 {
-	boost::recursive_mutex::scoped_lock lock(m_mtx);
 	m_need_home = false;
 }

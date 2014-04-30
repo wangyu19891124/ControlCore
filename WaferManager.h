@@ -35,6 +35,7 @@ public:
 	friend class SingletonT<WaferManager>;
 
 public:
+	void CreateWafer(int unit, unsigned short slot, const std::string& id, WaferSize size, WaferType type = WaferType_Product);
 	void CreateWafer(int unit, const std::string& casset_id, WaferSize size, WaferType type = WaferType_Product, unsigned int mapping = 0x1);
 	void RemoveWafer(int unit, unsigned int mapping = 0x1);
 

@@ -29,17 +29,31 @@ enum UnitState
 
 #define COMMAND_DELIMITER 1000
 #define	COMMAND_NONE 1000
+
 #define	COMMAND_HOME 1001
 #define	COMMAND_LOAD 1002
 #define	COMMAND_UNLOAD 1003
 #define	COMMAND_PROCESS 1004
 #define	COMMAND_CLEAN 1005
 #define	COMMAND_ALIGN 1006
+
 #define COMMAND_PUMP 1007
 #define COMMAND_VENT 1008
 #define COMMAND_PURGE 1009
-#define COMMAND_PIN_UPDOWN 1010
-#define COMMAND_LEAKCHECK 1011
+
+#define COMMAND_PINUP 1010
+#define COMMAND_PINDOWN 1011
+
+#define COMMAND_TURNON_HEATER 1012
+#define COMMAND_TURNOFF_HEATER 1013
+
+#define COMMAND_LEAKCHECK 1014
+
+#define COMMAND_ROTATE_FORWARD 1015
+#define COMMAND_ROTATE_BACKWARD 1016
+
+#define COMMAND_OPEN_DOOR 1017
+#define COMMAND_CLOSE_DOOR 1018
 
 
 struct UnitTask
@@ -75,6 +89,8 @@ protected:
 	virtual void SafeHandle() = 0;
 	virtual void TranslateTask(const UnitTask& task) = 0;
 	virtual void Notify(const std::string& msg) = 0;
+	virtual void OnAbort() = 0;
+	virtual bool OnlinePrecheck() = 0;
 
 private:
 	void work_fun();
@@ -113,8 +129,7 @@ protected:
 #define ADD_STEP_WAIT(timeout) step->Add(Wait(timeout));
 #define ADD_STEP_EXPECT(cond, duration, evt) step->Add(Expect(cond, duration, evt));
 
-#define END_UNIT_STEP boost::recursive_mutex::scoped_lock lock(m_mtx); \
-	m_steps.push_back(step); \
+#define END_UNIT_STEP m_steps.push_back(step); \
 	}
 
 
