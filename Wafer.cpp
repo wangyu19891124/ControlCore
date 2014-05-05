@@ -15,7 +15,7 @@ Wafer::Wafer(const std::string& id, int unit, unsigned short slot,
 		m_id(id), m_original_unit(unit), m_original_slot(slot),
 		m_size(size), m_type(type), m_state(state)
 {
-	Database::Instance().CreateWafer(id, wafer_type_to_string(type), wafer_size_to_string(size));
+	Database::Instance().CreateWafer(m_id, wafer_type_to_string(type), wafer_size_to_string(size));
 	Database::Instance().WaferEnter(m_id, unit, slot, wafer_state_to_string(m_state));
 }
 

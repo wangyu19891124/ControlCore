@@ -73,6 +73,10 @@ ParameterItem<float> PumpDownTargetPressure(7001,"PumpDownTargetPressure","Pump"
 ParameterItem<unsigned> SlowPumpTimeout(7003,"SlowPumpTimeout","Pump","Pump timeout from ATM to FastSlowSwitchPressure.",0,100,60,"s");
 ParameterItem<unsigned> FastPumpTimeout(7004,"FastPumpTimeout","Pump","Pump timeout from FastSlowSwitchPressure to Vacuum.",0,100,60,"s");
 
+
+//Wafer
+ParameterItem<unsigned> WaferSize(8000,"WaferSize","Wafer","Wafer size(150/200/300mm).",0,1000,300,"mm");
+
 }
 
 

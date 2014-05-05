@@ -18,5 +18,7 @@ extern SystemEvent HomingTimeout;
 extern SystemEvent GateValveTimeout;
 extern SystemEvent PumpTimeout;
 extern SystemEvent PumpError;
+extern SystemEvent UnknownWaferSize;
+extern SystemEvent LoadUnloadTimeout;
 
 }

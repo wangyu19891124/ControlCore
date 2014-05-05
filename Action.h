@@ -43,7 +43,10 @@ public:
 		if(boost::chrono::system_clock::now() > m_expired_time)
 		{
 			m_flag = true;
-			m_evt_f();
+			if(m_evt_f)
+			{
+				m_evt_f();
+			}
 			return RESULT_FAILED;
 		}
 

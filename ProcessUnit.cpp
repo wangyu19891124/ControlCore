@@ -8,9 +8,11 @@
 #include "Event.h"
 #include "ProcessUnit.h"
 #include "Parameters.h"
+#include "Data.h"
+#include "WaferManager.h"
 
 ProcessUnit::ProcessUnit(int id, const std::string& name) :
-		SmartUnit(id, name), m_dirty_flag(true)
+		SmartUnit(id, name), m_dirty_flag(true), m_load_unload_count(0)
 {
 }
 
@@ -73,7 +75,10 @@ void ProcessUnit::Notify(const std::string& msg)
 
 void ProcessUnit::OnAbort()
 {
-
+	if(m_task.command == COMMAND_LOAD || m_task.command == COMMAND_UNLOAD)
+	{
+		m_load_unload_count = 0;
+	}
 }
 
 bool ProcessUnit::OnlinePrecheck()
@@ -138,7 +143,7 @@ void ProcessUnit::TranslateTask(const UnitTask& task)
 	}
 }
 
-void ProcessUnit::OnHome()
+bool ProcessUnit::OnHome()
 {
 	if(Data::diPrcCbDoorClose == 0)
 	{
@@ -150,7 +155,7 @@ void ProcessUnit::OnHome()
 		OnPinDown();
 	}
 
-	NEW_UNIT_STEP(home, false)
+	NEW_UNIT_STEP("home", false)
 		ADD_STEP_COMMAND([&]()
 		{	Data::aoAxisControl = AxisHoming;
 			Data::doAxisExecute = (Data::doAxisExecute ? 0 : 1);})
@@ -162,31 +167,158 @@ void ProcessUnit::OnHome()
 
 	OnPinUp();
 	OnPinDown();
+
+	return true;
 }
 
-void ProcessUnit::OnLoad()
+void ProcessUnit::create_wafer(int unit, unsigned short slot)
 {
+	if(Data::LoadUnloadSkip)
+		return;
+
+	WaferSize wfs;
+	switch(Parameters::WaferSize)
+	{
+	case 100:
+		wfs = WaferSize_100mm;
+		break;
+	case 150:
+		wfs = WaferSize_150mm;
+		break;
+	case 200:
+		wfs = WaferSize_200mm;
+		break;
+	case 300:
+		wfs = WaferSize_300mm;
+		break;
+	default:
+		EVT::UnknownWaferSize.Report();
+		return;
+	}
+
+	WaferManager::Instance().CreateWafer(unit, slot, Data::WaferBatchID, wfs);
 }
 
-void ProcessUnit::OnUnload()
+bool ProcessUnit::OnLoad()
 {
+	float pos[3];
+	pos[0] = Parameters::ChuckPos1;
+	pos[1] = Parameters::ChuckPos2;
+	pos[2] = Parameters::ChuckPos3;
+
+	if(!OnOpenDoor())
+	{
+		return false;
+	}
+
+	std::stringstream ss;
+	for(int i=2; i>=0; i--)
+	{
+		ss.str("");
+		ss<<"load wafer "<<i;
+
+		float position = pos[i];
+		NEW_UNIT_STEP(ss.str(), false)
+			auto f1 = [&, position]()
+			{	Data::aoAxisPosition = position;
+				Data::aoAxisControl = AxisMoveAbsolute;
+				Data::doAxisExecute = (Data::doAxisExecute ? 0 : 1);};
+			ADD_STEP_COMMAND(f1)
+			ADD_STEP_WAIT(1000)
+			ADD_STEP_WAIT_CONDITION([&]()
+			{	return Data::diReachPosition == 1;},
+				1000*Parameters::RotateTimeout,
+				[position](){	EVT::RotateTimeout.Report(position);})
+			ADD_STEP_COMMAND([&](){Data::LoadUnloadState = 1;})
+			ADD_STEP_WAIT_CONDITION([&]()
+			{	return Data::LoadUnloadOK == 1;}, UINT_MAX,
+				[&](){EVT::LoadUnloadTimeout.Report();})
+			ADD_STEP_COMMAND([&]()
+			{	Data::LoadUnloadOK = 0;
+				Data::LoadUnloadState = 0;})
+			auto f2 = [this, i](){create_wafer(m_id, i);};
+			ADD_STEP_COMMAND(f2)
+			ADD_STEP_COMMAND([this](){++m_load_unload_count;})
+		END_UNIT_STEP
+	}
+
+	OnCloseDoor();
+
+	return true;
 }
 
-void ProcessUnit::OnProcess()
+void ProcessUnit::remove_wafer(int unit, unsigned short slot)
 {
-	NEW_UNIT_STEP(process, false)
+	if(Data::LoadUnloadSkip)
+		return;
+
+	WaferManager::Instance().RemoveWafer(unit, slot);
+}
+
+bool ProcessUnit::OnUnload()
+{
+	float pos[3];
+	pos[0] = Parameters::ChuckPos1;
+	pos[1] = Parameters::ChuckPos2;
+	pos[2] = Parameters::ChuckPos3;
+
+	if(!OnOpenDoor())
+	{
+		return false;
+	}
+
+	std::stringstream ss;
+	for(int i=0; i<3; i++)
+	{
+		ss.str("");
+		ss<<"unload wafer "<<i;
+
+		float position = pos[i];
+		NEW_UNIT_STEP(ss.str(), false)
+			auto f1 = [&, position]()
+			{	Data::aoAxisPosition = position;
+				Data::aoAxisControl = AxisMoveAbsolute;
+				Data::doAxisExecute = (Data::doAxisExecute ? 0 : 1);};
+			ADD_STEP_COMMAND(f1)
+			ADD_STEP_WAIT(1000)
+			ADD_STEP_WAIT_CONDITION([&]()
+			{	return Data::diReachPosition == 1;},
+				1000*Parameters::RotateTimeout,
+				[position](){	EVT::RotateTimeout.Report(position);})
+			ADD_STEP_COMMAND([&](){Data::LoadUnloadState = 1;})
+			ADD_STEP_WAIT_CONDITION([&]()
+			{	return Data::LoadUnloadOK == 1;}, UINT_MAX,
+				[&](){EVT::LoadUnloadTimeout.Report();})
+			ADD_STEP_COMMAND([&]()
+			{	Data::LoadUnloadOK = 0;
+				Data::LoadUnloadState = 0;})
+			auto f2 = [this, i](){remove_wafer(m_id, i);};
+			ADD_STEP_COMMAND(f2);
+			ADD_STEP_COMMAND([this](){--m_load_unload_count;})
+		END_UNIT_STEP
+	}
+
+	return true;
+}
+
+bool ProcessUnit::OnProcess()
+{
+	NEW_UNIT_STEP("process", false)
 		ADD_STEP_COMMAND([]()
 		{	std::cout<<"process command."<<std::endl;})
 	END_UNIT_STEP
+
+	return true;
 }
 
-void ProcessUnit::OnClean()
+bool ProcessUnit::OnClean()
 {
+	return true;
 }
 
-void ProcessUnit::OnPinUp()
+bool ProcessUnit::OnPinUp()
 {
-	NEW_UNIT_STEP(pin_up, false)
+	NEW_UNIT_STEP("pin up", false)
 		ADD_STEP_COMMAND([&]()
 		{	Data::doPinDownVal = 0;
 			Data::doPinUpVal = 1;})
@@ -195,11 +327,13 @@ void ProcessUnit::OnPinUp()
 			Parameters::WaferPinTimeout * 1000,
 			[&](){	EVT::PinUpDownTimeout.Report("up");})
 	END_UNIT_STEP
+
+	return true;
 }
 
-void ProcessUnit::OnPinDown()
+bool ProcessUnit::OnPinDown()
 {
-	NEW_UNIT_STEP(pin_down, false)
+	NEW_UNIT_STEP("pin down", false)
 		ADD_STEP_COMMAND([&]()
 		{	Data::doPinDownVal = 1;
 			Data::doPinUpVal = 0;})
@@ -208,6 +342,8 @@ void ProcessUnit::OnPinDown()
 			Parameters::WaferPinTimeout * 1000,
 			[&](){	EVT::PinUpDownTimeout.Report("down");})
 	END_UNIT_STEP
+
+	return true;
 }
 
 float ProcessUnit::get_next_position()
@@ -228,20 +364,23 @@ float ProcessUnit::get_next_position()
 	return pos[i%3];
 }
 
-void ProcessUnit::OnRotateForward()
+bool ProcessUnit::OnRotateForward()
 {
 	float next_pos = get_next_position();
-	NEW_UNIT_STEP(rotate_forward, true)
-		ADD_STEP_COMMAND([&]()
+	NEW_UNIT_STEP("rotate forward", true)
+		auto f = [&, next_pos]()
 		{	Data::aoAxisPosition = next_pos;
 			Data::aoAxisControl = AxisMoveAbsolute;
-			Data::doAxisExecute = (Data::doAxisExecute ? 0 : 1);})
+			Data::doAxisExecute = (Data::doAxisExecute ? 0 : 1);};
+		ADD_STEP_COMMAND(f)
 		ADD_STEP_WAIT(1000)
 		ADD_STEP_WAIT_CONDITION([&]()->bool
 		{	return Data::diReachPosition == 1;},
 			1000*Parameters::RotateTimeout,
 			[next_pos](){	EVT::RotateTimeout.Report(next_pos);})
 	END_UNIT_STEP
+
+	return true;
 }
 
 float ProcessUnit::get_last_position()
@@ -262,37 +401,39 @@ float ProcessUnit::get_last_position()
 	return pos[(i+3-1)%3];
 }
 
-void ProcessUnit::OnRotateBackward()
+bool ProcessUnit::OnRotateBackward()
 {
 	float last_pos = get_last_position();
-	NEW_UNIT_STEP(rotate_backward, true)
-		ADD_STEP_COMMAND([&]()
+	NEW_UNIT_STEP("rotate backward", true)
+		auto f = [&, last_pos]()
 		{	Data::aoAxisPosition = last_pos;
 			Data::aoAxisControl = AxisMoveAbsolute;
-			Data::doAxisExecute = (Data::doAxisExecute ? 0 : 1);})
+			Data::doAxisExecute = (Data::doAxisExecute ? 0 : 1);};
+		ADD_STEP_COMMAND(f)
 		ADD_STEP_WAIT(1000)
 		ADD_STEP_WAIT_CONDITION([&]()->bool
 		{	return Data::diReachPosition == 1;},
 			1000*Parameters::RotateTimeout,
 			[last_pos](){	EVT::RotateTimeout.Report(last_pos);})
 	END_UNIT_STEP
+
+	return true;
 }
 
-void ProcessUnit::OnPump()
+bool ProcessUnit::OnPump()
 {
-	if(Data::diPrcCbLidLeftClose == 0 || Data::diPrcCbLidLeftOpen == 1
-			|| Data::diPrcCbLidRightClose == 0 || Data::diPrcCbLidRightOpen == 1)
+	if(Data::diPrcCbLidLeftClose == 0 || Data::diPrcCbLidRightClose == 0)
 	{
 		EVT::GenericWarning.Report("Chamber lid isn't closed, pumping is aborted.");
-		return;
+		return false;
 	}
 
-	if(Data::diPrcCbDoorClose == 0 || Data::diPrcCbDoorOpen == 1)
+	if(Data::diPrcCbDoorClose == 0)
 	{
 		OnCloseDoor();
 	}
 
-	NEW_UNIT_STEP(open_apc, true)
+	NEW_UNIT_STEP("open apc", true)
 		ADD_STEP_COMMAND([&]()
 		{	Data::aoAPCPosition = 100;
 			Data::aoAPCControlMode = PositionMode;})
@@ -300,7 +441,7 @@ void ProcessUnit::OnPump()
 
 	if(Data::doEnableVPump == 0)
 	{
-		NEW_UNIT_STEP(turnon_pump, true)
+		NEW_UNIT_STEP("turn on pump", true)
 			ADD_STEP_COMMAND([&]()
 			{	Data::doVacFastProcCbVal = 0;
 				Data::doVacSlowProcCbVal = 0;
@@ -315,39 +456,40 @@ void ProcessUnit::OnPump()
 
 	if(Data::aiProcChamPressure > Parameters::FastSlowSwitchPressure)
 	{
-		NEW_UNIT_STEP(slow_pump, true)
+		NEW_UNIT_STEP("slow pump", true)
 			ADD_STEP_COMMAND([&]()
 			{	Data::doVacFastProcCbVal = 0;
 				Data::doVacSlowProcCbVal = 1;})
-			ADD_STEP_WAIT_CONDITION([&]()->bool
-			{	return Data::aiProcChamPressure < Parameters::FastSlowSwitchPressure;},
-				1000*Parameters::SlowPumpTimeout,
-				[&](){	EVT::PumpTimeout.Report(Data::aiProcChamPressure, Parameters::FastSlowSwitchPressure);})
+			auto condition_function = [&](){return Data::aiProcChamPressure < Parameters::FastSlowSwitchPressure;};
+			auto event_function = [&](){EVT::PumpTimeout.Report<float, float>(Data::aiProcChamPressure, Parameters::FastSlowSwitchPressure);};
+			ADD_STEP_WAIT_CONDITION(condition_function,	1000*Parameters::SlowPumpTimeout, event_function);
 		END_UNIT_STEP
 	}
 
-	NEW_UNIT_STEP(fast_pump, true)
+	NEW_UNIT_STEP("fast pump", true)
 		ADD_STEP_COMMAND([&]()
 		{	Data::doVacFastProcCbVal = 1;
 			Data::doVacSlowProcCbVal = 0;})
-		ADD_STEP_WAIT_CONDITION([&]()->bool
-		{	return Data::aiProcChamPressure < Parameters::PumpDownTargetPressure;},
-			1000*Parameters::FastPumpTimeout,
-			[&](){	EVT::PumpTimeout.Report(Data::aiProcChamPressure, Parameters::PumpDownTargetPressure);})
+		auto condition_function = [&](){return Data::aiProcChamPressure < Parameters::PumpDownTargetPressure;};
+		auto event_function = [&](){EVT::PumpTimeout.Report<float, float>(Data::aiProcChamPressure, Parameters::PumpDownTargetPressure);};
+		ADD_STEP_WAIT_CONDITION(condition_function,	1000*Parameters::FastPumpTimeout, event_function);
 	END_UNIT_STEP
+
+	return true;
 }
 
-void ProcessUnit::OnVent()
+bool ProcessUnit::OnVent()
 {
 	if(Data::aiProcChamPressure > Parameters::ATMPressure)
 	{
-		return;
+		return true;
 	}
 
 	if(m_dirty_flag)
 	{
-		EVT::GenericWarning.Report("Chamber is not clean, gate valve can't be opened.");
-		return;
+		OnPurge();
+		//EVT::GenericWarning.Report("Chamber is not clean, gate valve can't be opened.");
+		return false;
 	}
 //
 //	NEW_UNIT_STEP(vent, true)
@@ -361,16 +503,17 @@ void ProcessUnit::OnVent()
 //			[&](){	EVT::PumpTimeout.Report(Data::aiProcChamPressure, Parameters::PumpDownTargetPressure);})
 //	END_UNIT_STEP
 
+	return true;
 }
 
-void ProcessUnit::OnPurge()
+bool ProcessUnit::OnPurge()
 {
-
+	return true;
 }
 
-void ProcessUnit::OnTurnOnHeater()
+bool ProcessUnit::OnTurnOnHeater()
 {
-	NEW_UNIT_STEP(turn_on_heater, true)
+	NEW_UNIT_STEP("turn on heater", true)
 		ADD_STEP_COMMAND([&]()
 		{	Data::aoBodyHTTempSet = Parameters::BodyTemp;
 			Data::aoLidHTTempSet = Parameters::LidTemp;
@@ -383,33 +526,42 @@ void ProcessUnit::OnTurnOnHeater()
 			2000,
 			[&](){	EVT::TurnOnHeaterTimeout.Report();})
 	END_UNIT_STEP
+
+	return true;
 }
 
-void ProcessUnit::OnTurnOffHeater()
+bool ProcessUnit::OnTurnOffHeater()
 {
-	NEW_UNIT_STEP(turn_on_heater, false)
+	NEW_UNIT_STEP("turn on heater", false)
 		ADD_STEP_COMMAND([&]()
 		{	Data::doBodyHTEnable = 0;
 			Data::doLidHTEnable = 0;
 			Data::doChuckHTEnable = 0;})
 	END_UNIT_STEP
+
+	return true;
 }
 
-void ProcessUnit::OnOpenDoor()
+bool ProcessUnit::OnOpenDoor()
 {
+//	if(Data::diPrcCbDoorOpen == 1 && Data::diPrcCbDoorClose == 0)
+//	{
+//		return true;
+//	}
+
 	if(Data::aiProcChamPressure < Parameters::ATMPressure)
 	{
 		EVT::GenericWarning.Report("Chamber is not ATM, gate valve can't be opened.");
-		return;
+		return false;
 	}
 
 	if(m_dirty_flag)
 	{
 		EVT::GenericWarning.Report("Chamber is not clean, gate valve can't be opened.");
-		return;
+		return false;
 	}
 
-	NEW_UNIT_STEP(open_door, true)
+	NEW_UNIT_STEP("open door", true)
 		ADD_STEP_COMMAND([&]()
 		{	Data::doCbGateVal = 1;})
 		ADD_STEP_WAIT_CONDITION([&]()->bool
@@ -417,12 +569,18 @@ void ProcessUnit::OnOpenDoor()
 			1000*Parameters::GateValveTimeout,
 			[&](){	EVT::GateValveTimeout.Report();})
 	END_UNIT_STEP
+
+	return true;
 }
 
-void ProcessUnit::OnCloseDoor()
+bool ProcessUnit::OnCloseDoor()
 {
+//	if(Data::diPrcCbDoorOpen == 0 && Data::diPrcCbDoorClose == 1)
+//	{
+//		return true;
+//	}
 
-	NEW_UNIT_STEP(close_door, true)
+	NEW_UNIT_STEP("close door", true)
 		ADD_STEP_COMMAND([&]()
 		{	Data::doCbGateVal = 0;})
 		ADD_STEP_WAIT_CONDITION([&]()->bool
@@ -430,4 +588,6 @@ void ProcessUnit::OnCloseDoor()
 			1000*Parameters::GateValveTimeout,
 			[&](){	EVT::GateValveTimeout.Report();})
 	END_UNIT_STEP
+
+	return true;
 }

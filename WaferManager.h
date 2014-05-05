@@ -23,7 +23,7 @@ const unsigned short MAX_SLOT_NUM = 25;
 class WaferManager : public SingletonT<WaferManager>
 {
 protected:
-	WaferManager() : m_count(0) {};
+	WaferManager() = default;
 	WaferManager(const WaferManager&) = delete;
 	WaferManager& operator = (const WaferManager&) = delete;
 public:
@@ -35,9 +35,10 @@ public:
 	friend class SingletonT<WaferManager>;
 
 public:
-	void CreateWafer(int unit, unsigned short slot, const std::string& id, WaferSize size, WaferType type = WaferType_Product);
-	void CreateWafer(int unit, const std::string& casset_id, WaferSize size, WaferType type = WaferType_Product, unsigned int mapping = 0x1);
-	void RemoveWafer(int unit, unsigned int mapping = 0x1);
+	void CreateWafer(int unit, unsigned short slot, const std::string& batch_id, WaferSize size, WaferType type = WaferType_Product);
+//	void CreateWafer(int unit, const std::string& casset_id, WaferSize size, WaferType type = WaferType_Product, unsigned int mapping = 0x1);
+//	void RemoveWafer(int unit, unsigned int mapping = 0x1);
+	void RemoveWafer(int unit, unsigned short slot);
 
 	void Transfer(int src_unit, unsigned short src_slot, int dest_unit, unsigned short dest_slot);
 	bool HasWafer(int unit, unsigned short slot = 0);
@@ -63,7 +64,7 @@ private:
 private:
 	std::map<int, boost::shared_ptr<Wafer> > m_wafers;
 	boost::mutex m_mtx;
-	unsigned int m_count;
+	std::string m_last_batch_id;
 };
 
 #endif /* WAFERMANAGER_H_ */

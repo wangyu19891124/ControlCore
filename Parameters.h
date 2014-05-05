@@ -68,6 +68,8 @@ extern ParameterItem<float> PumpDownTargetPressure;
 extern ParameterItem<unsigned> SlowPumpTimeout;
 extern ParameterItem<unsigned> FastPumpTimeout;
 
+//Wafer
+extern ParameterItem<unsigned> WaferSize;
 }
 
 #endif

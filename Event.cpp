@@ -22,6 +22,8 @@ namespace EVT
 	SystemEvent GateValveTimeout(1014, EVENT_LEVEL_ERROR, "Open/Close gate valve timeout.");
 	SystemEvent PumpTimeout(1016, EVENT_LEVEL_ERROR, "Pumping timeout from %f (torr) to %f (torr).");
 	SystemEvent PumpError(1018, EVENT_LEVEL_ERROR, "Pump warning/alarm.");
+	SystemEvent UnknownWaferSize(1020, EVENT_LEVEL_ERROR, "Wafer size is unknown, wafer can't be created.");
+	SystemEvent LoadUnloadTimeout(1022, EVENT_LEVEL_ERROR, "Load/unload wafer timeout.");
 }
 
 

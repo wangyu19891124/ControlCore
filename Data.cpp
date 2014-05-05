@@ -235,11 +235,21 @@ SystemData<std::string> RecipeName(100013, "RecipeName", "UserDefine");
 SystemData<unsigned> RecipeTotalTime(100014, "RecipeTotalTime", "UserDefine", 0, 1000, 0, "s");
 SystemData<unsigned> RecipeElapseTime(100015, "RecipeElapseTime", "UserDefine", 0, 1000, 0, "s");
 
-SystemData<unsigned> WaferCount(100021, "WaferCount", "UserDefine", 0, 1000);
+SystemData<unsigned> LoadUnloadState(100018, "LoadUnloadState", "UserDefine", 0, 1);
+SystemData<unsigned> LoadUnloadSkip(100019, "LoadUnloadSkip", "UserDefine", 0, 1);
+SystemData<unsigned> LoadUnloadOK(100020, "LoadUnloadOK", "UserDefine", 0, 1);
+SystemData<unsigned> WaferProcessedCount(100021, "WaferProcessedCount", "UserDefine", 0, 1000);
+SystemData<std::string> WaferBatchID(100022, "WaferBatchID", "UserDefine");
+SystemData<unsigned> WaferBatchCount(100023, "WaferBatchCount", "UserDefine", 0, 100000);
+SystemData<unsigned> WaferTotalCount(100024, "WaferTotalCount", "UserDefine", 0, 100000);
 
 SystemData<std::string> LeakCheckResult(100030, "LeakCheckResult", "UserDefine");
 SystemData<float> LeakRate(100031, "LeakRate", "UserDefine", 0, 1000, 2, "torr/min");
 SystemData<unsigned> LeakCheckState(100032, "LeakCheckState", "UserDefine", 0, 1);
 SystemData<std::string> LeakCheckStateText(100033, "LeakCheckStateText", "UserDefine");
+
+SystemData<std::string> Slot1WaferID(100040, "Slot1WaferID", "UserDefine");
+SystemData<std::string> Slot2WaferID(100041, "Slot2WaferID", "UserDefine");
+SystemData<std::string> Slot3WaferID(100042, "Slot3WaferID", "UserDefine");
 
 }

@@ -121,7 +121,7 @@ protected:
 
 
 #define NEW_UNIT_STEP(name, retry) { \
-	boost::shared_ptr<TaskStep> step(new TaskStep(#name, retry));
+	boost::shared_ptr<TaskStep> step(new TaskStep(name, retry));
 
 
 #define ADD_STEP_COMMAND(func) step->Add(Command(func));

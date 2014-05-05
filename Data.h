@@ -234,9 +234,24 @@ extern SystemData<std::string> RecipeName;
 
 extern SystemData<unsigned> RecipeTotalTime;
 extern SystemData<unsigned> RecipeElapseTime;
-extern SystemData<unsigned> WaferCount;
+
+extern SystemData<unsigned> LoadUnloadState;
+extern SystemData<unsigned> LoadUnloadSkip;
+extern SystemData<unsigned> LoadUnloadOK;
+extern SystemData<unsigned> WaferProcessedCount;
+extern SystemData<std::string> WaferBatchID;
+extern SystemData<unsigned> WaferBatchCount;
+extern SystemData<unsigned> WaferTotalCount;
+
 extern SystemData<std::string> LeakTestResult;
 extern SystemData<float> LeakRate;
+extern SystemData<unsigned> LeakCheckState;
+extern SystemData<std::string> LeakCheckStateText;
+
+extern SystemData<std::string> Slot1WaferID;
+extern SystemData<std::string> Slot2WaferID;
+extern SystemData<std::string> Slot3WaferID;
+
 };
 
 #endif /* DATA_H_ */

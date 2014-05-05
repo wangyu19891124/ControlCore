@@ -53,29 +53,32 @@ protected:
 	virtual bool OnlinePrecheck();
 
 private:
-	void OnHome();
-	void OnLoad();
-	void OnProcess();
-	void OnUnload();
-	void OnClean();
-	void OnPinUp();
-	void OnPinDown();
-	void OnRotateForward();
-	void OnRotateBackward();
-	void OnPump();
-	void OnVent();
-	void OnPurge();
-	void OnTurnOnHeater();
-	void OnTurnOffHeater();
-	void OnOpenDoor();
-	void OnCloseDoor();
+	bool OnHome();
+	bool OnLoad();
+	bool OnProcess();
+	bool OnUnload();
+	bool OnClean();
+	bool OnPinUp();
+	bool OnPinDown();
+	bool OnRotateForward();
+	bool OnRotateBackward();
+	bool OnPump();
+	bool OnVent();
+	bool OnPurge();
+	bool OnTurnOnHeater();
+	bool OnTurnOffHeater();
+	bool OnOpenDoor();
+	bool OnCloseDoor();
 
 private:
 	float get_next_position();
 	float get_last_position();
+	void create_wafer(int unit, unsigned short slot);
+	void remove_wafer(int unit, unsigned short slot);
 
 private:
 	bool m_dirty_flag;
+	int m_load_unload_count;
 
 };
 
