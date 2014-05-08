@@ -115,6 +115,7 @@ void RecipeManager::DeleteRecipe(const std::string& recipe_name)
 void RecipeManager::UpdateInformation()
 {
 	Data::RecipeName = m_rcp.Name();
+	Data::RecipeTotalTime = m_rcp.Duration();
 	std::stringstream ss;
 	ss<<"Recipe changed, current recipe is ["<<m_rcp.Name()<<"].";
 	LogInfo(ss.str());

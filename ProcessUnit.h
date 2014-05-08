@@ -46,29 +46,47 @@ public:
 protected:
 	virtual UnitTask GetNextTask();
 	virtual void UpdateUnitInfo();
-	virtual void SafeHandle();
+	virtual void ErrorHandle();
 	virtual void TranslateTask(const UnitTask& task);
 	virtual void Notify(const std::string& msg);
 	virtual void OnAbort();
 	virtual bool OnlinePrecheck();
 
 private:
-	bool OnHome();
-	bool OnLoad();
-	bool OnProcess();
-	bool OnUnload();
-	bool OnClean();
-	bool OnPinUp();
-	bool OnPinDown();
-	bool OnRotateForward();
-	bool OnRotateBackward();
-	bool OnPump();
-	bool OnVent();
-	bool OnPurge();
-	bool OnTurnOnHeater();
-	bool OnTurnOffHeater();
+	void OnHome();
+	void OnLoad();
+	void OnUnload();
+	void OnProcess();
+
+	void OnLeakCheck(unsigned param);
+	void OnExpChamberLeakCheck();
+	void OnProcChamberLeakCheck();
+
+	void OnPinUp();
+	void OnPinDown();
+
+	void OnRotateForward();
+	void OnRotateBackward();
+
+	void OnPump(unsigned param);
+	bool OnPumpExpChamber();
+	bool OnPumpProcChamber();
+
+	void OnVent(unsigned param);
+	bool OnVentExpChamber();
+	bool OnVentProcChamber();
+
+	void OnPurge(unsigned param);
+	void OnPurgeHF();
+	void OnPurgeEtOH();
+	void OnPurgeExpChamber();
+	void OnPurgeProcChamber();
+
+	void OnTurnOnHeater();
+	void OnTurnOffHeater();
+
 	bool OnOpenDoor();
-	bool OnCloseDoor();
+	void OnCloseDoor();
 
 private:
 	float get_next_position();
@@ -77,8 +95,11 @@ private:
 	void remove_wafer(int unit, unsigned short slot);
 
 private:
-	bool m_dirty_flag;
+	bool m_proc_dirty_flag;
+	bool m_exp_dirty_flag;
 	int m_load_unload_count;
+
+	float m_leak_check_init_pressure;
 
 };
 

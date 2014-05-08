@@ -45,16 +45,19 @@ ParameterItem<unsigned> PurgeN2FlowAlarm(2012,"PurgeN2FlowAlarm","Flow","Purge N
 //Pressure
 ParameterItem<float> ATMPressure(3001,"ATMPressure","Pressure","ATM pressure",600,800,730,"torr");
 ParameterItem<float> VacuumPressure(3002,"VacuumPressure","Pressure","Vacuum pressure",0,100,10,"torr");
+ParameterItem<float> PressureDiffAllowance(3003,"PressureDiffAllowance","Pressure","Pressure difference allowance",0,100,60,"torr");
 
 
 //Purge
-ParameterItem<float> N2PurgeFlow(4000,"N2PurgeFlow","Purge","N2 purge flowrate.",0,5000,1000,"sccm");
+ParameterItem<unsigned> N2PurgeFlow(4000,"N2PurgeFlow","Purge","N2 purge flowrate.",0,5000,1000,"sccm");
 ParameterItem<unsigned> PurgeRepeatTimes(4002,"PurgeRepeatTimes","Purge","Repeat times for purge.",0,20,3,"times");
 ParameterItem<float> PurgeTargetPressure(4003,"PurgeTargetPressure","Purge","Purge target pressure.",0,500,400,"torr");
 ParameterItem<unsigned> FlushTime(4004,"FlushTime","Purge","Flush time after purge.",0,100,30,"s");
 ParameterItem<unsigned> FlushFlowrate(4005,"FlushFlowrate","Purge","Flush flowrate of N2.",0,5000,1000,"sccm");
 ParameterItem<unsigned> PurgeHoldTime(4006,"PurgeHoldTime","Purge","Hold time after reaching PurgeTargetPressure.",0,100,5,"s");
 ParameterItem<unsigned> PumpHoldTime(4007,"PumpHoldTime","Purge","Hold time after reaching PumpDownTargetPressure.",0,100,5,"s");
+ParameterItem<unsigned> HFPurgeFlow(4009,"HFPurgeFlow","Purge","HF purge N2 flowrate.",0,2000,1000,"sccm");
+ParameterItem<unsigned> EtOHPurgeFlow(4010,"EtOHPurgeFlow","Purge","EtOH purge N2 flowrate.",0,700,500,"sccm");
 
 
 //Valve
@@ -72,10 +75,18 @@ ParameterItem<float> FastSlowSwitchPressure(7000,"FastSlowSwitchPressure","Pump"
 ParameterItem<float> PumpDownTargetPressure(7001,"PumpDownTargetPressure","Pump","Pump down procedure finished when pressure lower than this value.",0,100,0.1,"torr");
 ParameterItem<unsigned> SlowPumpTimeout(7003,"SlowPumpTimeout","Pump","Pump timeout from ATM to FastSlowSwitchPressure.",0,100,60,"s");
 ParameterItem<unsigned> FastPumpTimeout(7004,"FastPumpTimeout","Pump","Pump timeout from FastSlowSwitchPressure to Vacuum.",0,100,60,"s");
+ParameterItem<unsigned> PumpExpTimeout(7005,"PumpExpTimeout","Pump","Pump expansion chamber timeout.",0,100,60,"s");
 
 
 //Wafer
 ParameterItem<unsigned> WaferSize(8000,"WaferSize","Wafer","Wafer size(150/200/300mm).",0,1000,300,"mm");
+
+
+//LeakCheck
+ParameterItem<float> LeakCheckPressure(9000,"LeakCheckPressure","LeakCheck","Initial pressure of leak checking.",0,100,10,"torr");
+ParameterItem<unsigned> LeakCheckPumpHoldTime(9001,"LeakCheckPumpHoldTime","LeakCheck","Time for keep pumping after reaching leak check pressure.",0,600,30,"s");
+ParameterItem<unsigned> LeakCheckTime(9002,"LeakCheckTime","LeakCheck","Leak check time.",0,3600,1200,"s");
+ParameterItem<float> LeakCheckThreshold(9003,"LeakCheckThreshold","LeakCheck","Leak check threshold, pass if less than this value.",0,10,5,"torr/min");
 
 }
 

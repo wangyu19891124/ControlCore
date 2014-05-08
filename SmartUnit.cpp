@@ -216,7 +216,7 @@ void SmartUnit::work_fun()
 					}
 					else if (rtv == RESULT_FAILED)
 					{
-						SafeHandle();
+						ErrorHandle();
 						m_state = State_Error;
 					}
 				}

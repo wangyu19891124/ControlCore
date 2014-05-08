@@ -86,7 +86,7 @@ protected:
 protected:
 	virtual UnitTask GetNextTask() = 0;
 	virtual void UpdateUnitInfo() = 0;
-	virtual void SafeHandle() = 0;
+	virtual void ErrorHandle() = 0;
 	virtual void TranslateTask(const UnitTask& task) = 0;
 	virtual void Notify(const std::string& msg) = 0;
 	virtual void OnAbort() = 0;
@@ -125,9 +125,9 @@ protected:
 
 
 #define ADD_STEP_COMMAND(func) step->Add(Command(func));
-#define ADD_STEP_WAIT_CONDITION(cond, timeout, evt) step->Add(WaitCondition(cond, timeout, evt));
-#define ADD_STEP_WAIT(timeout) step->Add(Wait(timeout));
-#define ADD_STEP_EXPECT(cond, duration, evt) step->Add(Expect(cond, duration, evt));
+#define ADD_STEP_WAIT_CONDITION(cond, timeout, evt) step->Add(WaitCondition(cond, 1000*timeout, evt));
+#define ADD_STEP_WAIT(timeout) step->Add(Wait(1000*timeout));
+#define ADD_STEP_EXPECT(cond, duration, evt) step->Add(Expect(cond, 1000*duration, evt));
 
 #define END_UNIT_STEP m_steps.push_back(step); \
 	}
