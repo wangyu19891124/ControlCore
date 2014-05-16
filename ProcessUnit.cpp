@@ -11,8 +11,11 @@
 #include "Data.h"
 #include "WaferManager.h"
 
+using boost::chrono;
+
 ProcessUnit::ProcessUnit(int id, const std::string& name) :
-		SmartUnit(id, name), m_proc_dirty_flag(true), m_exp_dirty_flag(true), m_load_unload_count(0)
+		SmartUnit(id, name), m_proc_dirty_flag(true), m_exp_dirty_flag(true), m_load_unload_count(0),
+		m_leak_check_init_pressure(0)
 {
 }
 
@@ -157,7 +160,7 @@ void ProcessUnit::OnHome()
 
 	NEW_UNIT_STEP("home", false)
 		ADD_STEP_COMMAND([&]()
-		{	Data::aoAxisControl = AxisHoming;
+		{	Data::aoAxisControl = AxisControl_Homing;
 			Data::doAxisExecute = (Data::doAxisExecute ? 0 : 1);})
 		ADD_STEP_WAIT_CONDITION([&]()->bool
 		{	return Data::diAxisNotMoving == 1 && Data::diAxisMoving == 0;},
@@ -219,7 +222,7 @@ void ProcessUnit::OnLoad()
 		NEW_UNIT_STEP(ss.str(), false)
 			auto f1 = [&, position]()
 			{	Data::aoAxisPosition = position;
-				Data::aoAxisControl = AxisMoveAbsolute;
+				Data::aoAxisControl = AxisControl_Absolute;
 				Data::doAxisExecute = (Data::doAxisExecute ? 0 : 1);};
 			ADD_STEP_COMMAND(f1)
 			ADD_STEP_WAIT(1000)
@@ -273,7 +276,7 @@ void ProcessUnit::OnUnload()
 		NEW_UNIT_STEP(ss.str(), false)
 			auto f1 = [&, position]()
 			{	Data::aoAxisPosition = position;
-				Data::aoAxisControl = AxisMoveAbsolute;
+				Data::aoAxisControl = AxisControl_Absolute;
 				Data::doAxisExecute = (Data::doAxisExecute ? 0 : 1);};
 			ADD_STEP_COMMAND(f1)
 			ADD_STEP_WAIT(1000)
@@ -295,11 +298,214 @@ void ProcessUnit::OnUnload()
 	}
 }
 
+void ProcessUnit::process_recipe_step(unsigned index, const RecipeStep& recipe_step)
+{
+	Data::CurrentStepTime = recipe_step.Duration();
+	Data::CurrentStep = index + 1;
+	Data::StepElapseTime = 0;
+	m_step_start_time = boost::chrono::system_clock::now();
+	if (recipe_step.Mode() == APCMode_Position)
+	{
+		Data::aoAPCControlMode = APCControl_Position;
+		Data::aoAPCPosition = recipe_step.Position();
+		//Monitor::Instance().Disable("ProcessPressure");
+	}
+	else
+	{
+		Data::aoAPCControlMode = APCControl_Pressure;
+		float pressure = recipe_step.Pressure();
+		float pres_warn_offset = Parameters::PressureWarnOffset;
+		float pres_alarm_offset = Parameters::PressureAlarmOffset;
+		Data::aoAPCPressure = pressure;
+		Monitor::Instance().Reset("ProcessPressure", pressure, pres_warn_offset, pres_alarm_offset);
+	}
+	unsigned short rpm = recipe_step.RotateSpeed();
+	if (rpm > 0)
+	{
+		Data::aoAxisVelocity = rpm * 360 / 60;
+		Data::aoAxisControl = AxisControl_Velocity;
+	}
+	else
+	{
+		Data::aoAxisControl = AxisControl_Stop;
+	}
+	Data::doAxisExecute = (Data::doAxisExecute ? 0 : 1);
+
+	float flowrate = 0;
+	float flow_warn_offset = 0;
+	float flow_alarm_offset = 0;
+	BypassMode bps_mode = recipe_step.HFBypass();
+	if (bps_mode == BypassMode_None)
+	{
+		Data::doExpCbHFInletVal = 0;
+		Data::doVaHFValve = 0;
+		Data::aoHFFlowSetpoint = 0;
+	}
+	else
+	{
+		if (bps_mode == BypassMode_Bypass)
+		{
+			Data::doExpCbHFInletVal = 0;
+			Data::doVaHFValve = 1;
+		}
+		else
+		{
+			Data::doExpCbHFInletVal = 1;
+			Data::doVaHFValve = 0;
+		}
+
+		flowrate = recipe_step.HFFlowrate();
+		flow_warn_offset = 0.01 * flowrate * Parameters::FlowWarnProportion;
+		flow_warn_offset = std::max<float>(Parameters::FlowWarnMinimum, flow_warn_offset);
+		flow_alarm_offset = 0.01 * flowrate * Parameters::FlowAlarmProportion;
+		flow_alarm_offset = std::max<float>(Parameters::FlowAlarmMinimum, flow_alarm_offset);
+		Data::aoHFFlowSetpoint = flowrate;
+		Monitor::Instance().Reset("HFFlow", flowrate, flow_warn_offset, flow_alarm_offset);
+	}
+	Data::doHFMFCVal1 = 1;
+	Data::doHFMFCVal2 = 1;
+
+	bps_mode = recipe_step.EtOHBypass();
+	if (bps_mode == BypassMode_None)
+	{
+		Data::doExpCbVacIPASupply = 0;
+		Data::doVaVapValve = 0;
+		Data::aoEtOHFlowSetpoint = 0;
+	}
+	else
+	{
+		if (bps_mode == BypassMode_Bypass)
+		{
+			Data::doExpCbVacIPASupply = 0;
+			Data::doVaVapValve = 1;
+		}
+		else
+		{
+			Data::doExpCbVacIPASupply = 1;
+			Data::doVaVapValve = 0;
+		}
+		flowrate = recipe_step.EtOHFlowrate();
+		flow_warn_offset = 0.01 * flowrate * Parameters::FlowWarnProportion;
+		flow_warn_offset = std::max<float>(Parameters::FlowWarnMinimum, flow_warn_offset);
+		flow_alarm_offset = 0.01 * flowrate * Parameters::FlowAlarmProportion;
+		flow_alarm_offset = std::max<float>(Parameters::FlowAlarmMinimum, flow_alarm_offset);
+		Data::aoEtOHFlowSetpoint = flowrate;
+		Monitor::Instance().Reset("EtOHFlow", flowrate, flow_warn_offset, flow_alarm_offset);
+	}
+	Data::doAlcMFCVal1 = 1;
+	Data::doAlcMFCVal2 = 1;
+
+	Data::doN2MFCVal1 = 1;
+	Data::doN2MFCVal2 = 1;
+	flowrate = recipe_step.N2Flowrate();
+	flow_warn_offset = 0.01 * flowrate * Parameters::FlowWarnProportion;
+	flow_warn_offset = std::max<float>(Parameters::FlowWarnMinimum, flow_warn_offset);
+	flow_alarm_offset = 0.01 * flowrate * Parameters::FlowAlarmProportion;
+	flow_alarm_offset = std::max<float>(Parameters::FlowAlarmMinimum, flow_alarm_offset);
+	Data::aoN2FlowSetpoint = flowrate;
+	Monitor::Instance().Reset("N2Flow", flowrate, flow_warn_offset, flow_alarm_offset);
+
+	Data::doPurgeN2MFCVal1 = 1;
+	Data::doPurgeN2MFCVal2 = 1;
+	flowrate = recipe_step.N2PurgeFlowrate();
+	flow_warn_offset = 0.01 * flowrate * Parameters::FlowWarnProportion;
+	flow_warn_offset = std::max<float>(Parameters::FlowWarnMinimum, flow_warn_offset);
+	flow_alarm_offset = 0.01 * flowrate * Parameters::FlowAlarmProportion;
+	flow_alarm_offset = std::max<float>(Parameters::FlowAlarmMinimum, flow_alarm_offset);
+	Data::aoPurgeN2FlowSetpoint = flowrate;
+	Monitor::Instance().Reset("N2PurgeFlow", flowrate, flow_warn_offset, flow_alarm_offset);
+}
+
 void ProcessUnit::OnProcess()
 {
-	NEW_UNIT_STEP("process", false)
+	if(Data::aiProcChamPressure > Parameters::VacuumPressure)
+	{
+		EVT::ChamberNotVacuum.Report("Process");
+		return;
+	}
+
+	if(Data::aiExpChamPressure > Parameters::VacuumPressure)
+	{
+		EVT::ChamberNotVacuum.Report("Expansion");
+		return;
+	}
+
+	Recipe rcp;
+	RecipeManager::Instance().GetRecipe(rcp);
+	unsigned steps = rcp.TotalStep();
+	unsigned recipe_duration = rcp.Duration();
+
+	NEW_UNIT_STEP("prepare process", false)
 		ADD_STEP_COMMAND([]()
-		{	std::cout<<"process command."<<std::endl;})
+		{	Data::doExpCbVapVacValve = 0;
+			Data::doN2SupplyProcVal = 0;
+			Data::doAlcTankOpen = 1;
+			Data::doVaSupplyIPAValve = 1;
+			Data::doHFFacSupplyVal = 1;
+			Data::doVapBypassValve = 0;
+			Data::doVapSupplyN2Valve = 1;
+			Data::doVacSlowProcCbVal = 0;
+			Data::doVacFastProcCbVal = 1;
+			Data::doExpCbSupplyCbVal = 1;
+			Data::RecipeElapseTime = 0;
+			Data::doAlcMFCVal3 = 0;
+			Data::doHFMFCVal3 = 0;
+			Data::doExpCbVacValve = 1;
+		})
+		auto f = [this, steps, recipe_duration]()
+		{	m_recipe_start_time = boost::chrono::system_clock::now();
+			Data::TotalSteps = steps;
+			Data::RecipeTotalTime = recipe_duration;
+		};
+		ADD_STEP_COMMAND(f)
+	END_UNIT_STEP
+
+	std::stringstream ss;
+	for(unsigned i=0; i<steps; i++)
+	{
+		const RecipeStep& rcp_step = rcp.Step(i);
+		unsigned step_time = rcp_step.Duration();
+		ss.str("");
+		ss<<"process step "<<(i+1);
+		NEW_UNIT_STEP(ss.str(), false)
+			auto f = [&, i, rcp_step](){ process_recipe_step(i, rcp_step);};
+			ADD_STEP_COMMAND(f)
+			auto condition = [&]()
+			{
+				auto dur = duration_cast<chrono::seconds>(chrono::system_clock::now() - m_step_start_time);
+				Data::StepElapseTime = dur.count();
+				dur = boost::chrono::duration_cast<chrono::seconds>(chrono::system_clock::now() - m_recipe_start_time);
+				Data::RecipeElapseTime = dur.count();
+
+				return !Monitor::Instance().HasAlarm();
+			};
+			ADD_STEP_EXPECT(condition, step_time, [&](){EVT::ProcessAlarm.Report();})
+			ADD_STEP_COMMAND([&](){Monitor::Instance().DisableAll();})
+		END_UNIT_STEP
+	}
+
+	NEW_UNIT_STEP("process finish", false)
+		auto f = [&, steps, recipe_duration]()
+		{	Data::doHFFacSupplyVal = 0;
+			Data::doVapSupplyN2Valve = 0;
+			Data::doAlcMFCVal1 = 0;
+			Data::doAlcMFCVal2 = 0;
+			Data::aoEtOHFlowSetpoint = 0;
+			Data::doHFMFCVal1 = 0;
+			Data::doHFMFCVal2 = 0;
+			Data::aoHFFlowSetpoint = 0;
+			Data::doN2MFCVal1 = 0;
+			Data::doN2MFCVal2 = 0;
+			Data::aoN2FlowSetpoint = 0;
+			Data::doPurgeN2MFCVal1 = 0;
+			Data::doPurgeN2MFCVal2 = 0;
+			Data::aoPurgeN2FlowSetpoint = 0;
+			Data::CurrentStep = steps;
+			Data::RecipeElapseTime = recipe_duration;
+			Data::aoAPCControlMode = APCControl_Position;
+			Data::aoAPCPosition = 100;
+		};
+		ADD_STEP_COMMAND(f)
 	END_UNIT_STEP
 }
 
@@ -344,7 +550,7 @@ void ProcessUnit::OnProcChamberLeakCheck()
 		{	Data::doExpCbSupplyCbVal = 0;
 			Data::doN2SupplyProcVal = 0;
 			Data::aoAPCPosition = 100;
-			Data::aoAPCControlMode = PositionMode;})
+			Data::aoAPCControlMode = APCControl_Position;})
 	END_UNIT_STEP
 
 	if(Data::doEnableVPump == 0)
@@ -441,8 +647,8 @@ void ProcessUnit::OnExpChamberLeakCheck()
 		{	Data::doExpCbSupplyCbVal = 0;
 			Data::doExpCbVacIPASupply = 0;
 			Data::doExpCbHFInletVal = 0;
-			Data::doA3cMFCBypassVal1 = 0;
-			Data::doA3cMFCBypassVal2 = 0;
+			Data::doPurgeN2MFCVal1 = 0;
+			Data::doPurgeN2MFCVal2 = 0;
 			Data::aoPurgeN2FlowSetpoint = 0;
 			Data::doVaVapValve = 0;
 			Data::doVaHFValve = 0;
@@ -529,7 +735,7 @@ void ProcessUnit::OnRotateForward()
 	NEW_UNIT_STEP("rotate forward", true)
 		auto f = [&, next_pos]()
 		{	Data::aoAxisPosition = next_pos;
-			Data::aoAxisControl = AxisMoveAbsolute;
+			Data::aoAxisControl = AxisControl_Absolute;
 			Data::doAxisExecute = (Data::doAxisExecute ? 0 : 1);};
 		ADD_STEP_COMMAND(f)
 		ADD_STEP_WAIT(1000)
@@ -564,7 +770,7 @@ void ProcessUnit::OnRotateBackward()
 	NEW_UNIT_STEP("rotate backward", true)
 		auto f = [&, last_pos]()
 		{	Data::aoAxisPosition = last_pos;
-			Data::aoAxisControl = AxisMoveAbsolute;
+			Data::aoAxisControl = AxisControl_Absolute;
 			Data::doAxisExecute = (Data::doAxisExecute ? 0 : 1);};
 		ADD_STEP_COMMAND(f)
 		ADD_STEP_WAIT(1000)
@@ -608,7 +814,7 @@ bool ProcessUnit::OnPumpProcChamber()
 		{	Data::doExpCbSupplyCbVal = 0;
 			Data::doN2SupplyProcVal = 0;
 			Data::aoAPCPosition = 100;
-			Data::aoAPCControlMode = PositionMode;})
+			Data::aoAPCControlMode = APCControl_Position;})
 	END_UNIT_STEP
 
 	if(Data::doEnableVPump == 0)
@@ -688,8 +894,8 @@ bool ProcessUnit::OnPumpExpChamber()
 		{	Data::doExpCbSupplyCbVal = 0;
 			Data::doExpCbVacIPASupply = 0;
 			Data::doExpCbHFInletVal = 0;
-			Data::doA3cMFCBypassVal1 = 0;
-			Data::doA3cMFCBypassVal2 = 0;
+			Data::doPurgeN2MFCVal1 = 0;
+			Data::doPurgeN2MFCVal2 = 0;
 			Data::aoPurgeN2FlowSetpoint = 0;
 			Data::doVaVapValve = 0;
 			Data::doVaHFValve = 0;
@@ -722,6 +928,37 @@ void ProcessUnit::OnVent(unsigned param)
 
 bool ProcessUnit::OnVentExpChamber()
 {
+	if(Data::aiExpChamPressure > Parameters::ATMPressure)
+	{
+		return true;
+	}
+
+	if(m_exp_dirty_flag)
+	{
+		//OnPurgeProcChamber();
+		EVT::ChamberNotClean.Report("Expansion");
+		return false;
+	}
+
+	NEW_UNIT_STEP("vent", true)
+		ADD_STEP_COMMAND([&]()
+		{	Data::doExpCbVapVacValve = 0;
+			Data::doExpCbSupplyCbVal = 0;
+			Data::doExpCbVacIPASupply = 0;
+			Data::doExpCbHFInletVal = 0;
+			Data::doPurgeN2MFCVal1 = 1;
+			Data::doPurgeN2MFCVal2 = 1;
+			Data::aoPurgeN2FlowSetpoint = Parameters::ExpVentFlowrate;})
+		ADD_STEP_WAIT_CONDITION([&]()->bool
+		{	return Data::aiExpChamPressure > Parameters::ATMPressure;},
+			Parameters::VentExpTimeout,
+			[&](){	EVT::VentTimeout.Report("expansion");})
+		ADD_STEP_COMMAND([&]()
+		{	Data::doPurgeN2MFCVal1 = 0;
+			Data::doPurgeN2MFCVal2 = 0;
+			Data::aoPurgeN2FlowSetpoint = 0;})
+	END_UNIT_STEP
+
 	return true;
 }
 
@@ -734,21 +971,23 @@ bool ProcessUnit::OnVentProcChamber()
 
 	if(m_proc_dirty_flag)
 	{
-		OnPurgeProcChamber();
-		//EVT::GenericWarning.Report("Chamber is not clean, gate valve can't be opened.");
+		//OnPurgeProcChamber();
+		EVT::ChamberNotClean.Report("Process");
 		return false;
 	}
-//
-//	NEW_UNIT_STEP(vent, true)
-//		ADD_STEP_COMMAND([&]()
-//		{	Data::doVacFastProcCbVal = 0;
-//			Data::doVacSlowProcCbVal = 0;
-//			Data::doExpCbSupplyCbVal = 0;})
-//		ADD_STEP_WAIT_CONDITION([&]()->bool
-//		{	return Data::aiProcChamPressure < Parameters::PumpDownTargetPressure;},
-//			Parameters::FastPumpTimeout,
-//			[&](){	EVT::PumpTimeout.Report(Data::aiProcChamPressure, Parameters::PumpDownTargetPressure);})
-//	END_UNIT_STEP
+
+	NEW_UNIT_STEP("vent", true)
+		ADD_STEP_COMMAND([&]()
+		{	Data::doVacFastProcCbVal = 0;
+			Data::doVacSlowProcCbVal = 0;
+			Data::doN2SupplyProcVal = 1;
+			Data::doExpCbSupplyCbVal = 0;})
+		ADD_STEP_WAIT_CONDITION([&]()->bool
+		{	return Data::aiProcChamPressure > Parameters::ATMPressure;},
+			Parameters::VentProcTimeout,
+			[&](){	EVT::VentTimeout.Report("process");})
+		ADD_STEP_COMMAND([&](){	Data::doN2SupplyProcVal = 0;})
+	END_UNIT_STEP
 
 	return true;
 }
@@ -779,9 +1018,9 @@ void ProcessUnit::OnPurgeHF()
 	NEW_UNIT_STEP("prepare purge HF", false)
 		ADD_STEP_COMMAND([&]()
 		{	Data::doHFFacSupplyVal = 0;
-			Data::doA2cMFCBypassVal1 = 1;
-			Data::doA2cMFCBypassVal2 = 1;
-			Data::doA2cMFCBypassVal3 = 1;
+			Data::doHFMFCVal1 = 1;
+			Data::doHFMFCVal2 = 1;
+			Data::doHFMFCVal3 = 1;
 			Data::doExpCbHFInletVal = 0;
 			Data::doVaHFValve = 1;
 			Data::doExpCbVapVacValve = 0;
@@ -805,9 +1044,9 @@ void ProcessUnit::OnPurgeHF()
 
 	NEW_UNIT_STEP("finish purge HF", false)
 		ADD_STEP_COMMAND([&]()
-		{	Data::doA2cMFCBypassVal1 = 0;
-			Data::doA2cMFCBypassVal2 = 0;
-			Data::doA2cMFCBypassVal3 = 0;
+		{	Data::doHFMFCVal1 = 0;
+			Data::doHFMFCVal2 = 0;
+			Data::doHFMFCVal3 = 0;
 			Data::doVaHFValve = 0;
 			Data::doExpCbVacValve = 0;})
 	END_UNIT_STEP
@@ -834,9 +1073,9 @@ void ProcessUnit::OnPurgeEtOH()
 			Data::doVaSupplyIPAValve = 1;
 			Data::doAlcTankOpen = 1;
 			Data::doPurgeAlcTank = 1;
-			Data::doAlcMFCBypassVal1 = 1;
-			Data::doAlcMFCBypassVal2 = 1;
-			Data::doAlcMFCBypassVal3 = 1;})
+			Data::doAlcMFCVal1 = 1;
+			Data::doAlcMFCVal2 = 1;
+			Data::doAlcMFCVal3 = 1;})
 	END_UNIT_STEP
 
 	for(unsigned i=0; i<Parameters::PurgeRepeatTimes; i++)
@@ -855,9 +1094,9 @@ void ProcessUnit::OnPurgeEtOH()
 
 	NEW_UNIT_STEP("finish purge EtOH", false)
 		ADD_STEP_COMMAND([&]()
-		{	Data::doAlcMFCBypassVal1 = 0;
-			Data::doAlcMFCBypassVal2 = 0;
-			Data::doAlcMFCBypassVal3 = 0;
+		{	Data::doAlcMFCVal1 = 0;
+			Data::doAlcMFCVal2 = 0;
+			Data::doAlcMFCVal3 = 0;
 			Data::doVaVapValve = 0;
 			Data::doExpCbVacValve = 0;
 			Data::doVaSupplyIPAValve = 0;
@@ -877,19 +1116,19 @@ void ProcessUnit::OnPurgeExpChamber()
 			Data::doVaVapValve = 0;
 			Data::doExpCbVapVacValve = 1;
 			Data::doExpCbVacValve = 1;
-			Data::doA3cMFCBypassVal1 = 0;
-			Data::doA3cMFCBypassVal2 = 1;})
+			Data::doPurgeN2MFCVal1 = 0;
+			Data::doPurgeN2MFCVal2 = 1;})
 	END_UNIT_STEP
 
 	for(unsigned i=0; i<Parameters::PurgeRepeatTimes; i++)
 	{
 		NEW_UNIT_STEP("purge expansion chamber", false)
 			ADD_STEP_COMMAND([&]()
-			{	Data::doA3cMFCBypassVal1 = 1;
+			{	Data::doPurgeN2MFCVal1 = 1;
 				Data::aoPurgeN2FlowSetpoint = Parameters::N2PurgeFlow;})
 			ADD_STEP_WAIT(Parameters::PurgeHoldTime)
 			ADD_STEP_COMMAND([&]()
-			{	Data::doA3cMFCBypassVal1 = 0;
+			{	Data::doPurgeN2MFCVal1 = 0;
 				Data::aoPurgeN2FlowSetpoint = 0;})
 			ADD_STEP_WAIT(Parameters::PumpHoldTime)
 		END_UNIT_STEP
@@ -897,7 +1136,7 @@ void ProcessUnit::OnPurgeExpChamber()
 
 	NEW_UNIT_STEP("finish purge expansion chamber", false)
 		ADD_STEP_COMMAND([&]()
-		{	Data::doA3cMFCBypassVal2 = 0;
+		{	Data::doPurgeN2MFCVal2 = 0;
 			m_exp_dirty_flag = false;})
 	END_UNIT_STEP
 }
@@ -915,7 +1154,7 @@ void ProcessUnit::OnPurgeProcChamber()
 		{	Data::doExpCbSupplyCbVal = 0;
 			Data::doN2SupplyProcVal = 0;
 			Data::aoAPCPosition = 100;
-			Data::aoAPCControlMode = PositionMode;
+			Data::aoAPCControlMode = APCControl_Position;
 			Data::doVacFastProcCbVal = 1;
 			Data::doVacSlowProcCbVal = 0;})
 		auto condition_function = [&](){return Data::aiProcChamPressure < Parameters::PumpDownTargetPressure;};

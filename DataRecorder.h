@@ -18,32 +18,24 @@
 
 #include "Singleton.h"
 
-enum RecordItemID
-{
-	RecordItem_N2,
-	RecordItem_EtOH,
-	RecordItem_HF,
-	RecordItem_Pressure,
-};
 
 class RecordItem
 {
 public:
 	RecordItem() = delete;
-	RecordItem(RecordItemID id, const std::string& name, bool enable = false);
+	RecordItem(const std::string& name, bool enable = false);
 	RecordItem(const RecordItem&) = delete;
 	virtual ~RecordItem() = default;
 	RecordItem& operator = (const RecordItem&) = delete;
 
 	bool operator == (const RecordItem&);
-	RecordItemID GetID();
+	bool IsName(const std::string& name);
 	void Enable();
 	void Disable();
 
 	virtual void Monitor() = 0;
 
 protected:
-	RecordItemID m_id;
 	std::string m_name;
 	bool m_enable_flag;
 };
@@ -51,7 +43,7 @@ protected:
 class IntervalRecordItem : public RecordItem
 {
 public:
-	IntervalRecordItem(RecordItemID id, const std::string& name, unsigned interval,
+	IntervalRecordItem(const std::string& name, unsigned interval,
 			boost::function<float ()> f, bool enable = false);
 	virtual ~IntervalRecordItem() = default;
 
@@ -66,7 +58,7 @@ private:
 class SwitchRecordItem : public RecordItem
 {
 public:
-	SwitchRecordItem(RecordItemID id, const std::string& name,
+	SwitchRecordItem(const std::string& name,
 			boost::function<unsigned ()> f, bool enable = false);
 	virtual ~SwitchRecordItem() = default;
 
@@ -88,10 +80,10 @@ public:
 
 	void Initialize();
 	void Terminate();
-	void Enable(RecordItemID id);
-	void Disable(RecordItemID id);
+	void Enable(const std::string& name);
+	void Disable(const std::string& name);
 	void Add(boost::shared_ptr<RecordItem> item);
-	void Remove(RecordItemID id);
+	void Remove(const std::string& name);
 
 	friend class SingletonT<DataRecorder>;
 private:

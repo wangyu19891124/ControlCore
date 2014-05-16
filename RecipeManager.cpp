@@ -116,6 +116,11 @@ void RecipeManager::UpdateInformation()
 {
 	Data::RecipeName = m_rcp.Name();
 	Data::RecipeTotalTime = m_rcp.Duration();
+	Data::RecipeElapseTime = 0;
+	Data::TotalSteps = m_rcp.TotalStep();
+	Data::CurrentStep = 0;
+	Data::CurrentStepTime = 0;
+	Data::StepElapseTime = 0;
 	std::stringstream ss;
 	ss<<"Recipe changed, current recipe is ["<<m_rcp.Name()<<"].";
 	LogInfo(ss.str());

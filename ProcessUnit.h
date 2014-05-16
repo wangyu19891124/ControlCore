@@ -10,27 +10,28 @@
 
 #include "SmartUnit.h"
 
+
 enum AxisControl : unsigned
 {
-	AxisStop = 0,
-	AxisReset = 1,
-	AxisMoveAbsolute = 2,
-	AxisMoveRelative = 3,
-	AxisMoveVelocity = 4,
-	AxisHoming = 5
+	AxisControl_Stop = 0,
+	AxisControl_Reset = 1,
+	AxisControl_Absolute = 2,
+	AxisControl_Relative = 3,
+	AxisControl_Velocity = 4,
+	AxisControl_Homing = 5,
 };
 
 enum LightControl : unsigned
 {
-	LightOff = 0,
-	LightOn = 1,
-	LightFlash = 256
+	LightControl_Off = 0,
+	LightControl_On = 1,
+	LightControl_Flash = 256
 };
 
-enum APCMode : unsigned
+enum APCControl : unsigned
 {
-	PressureMode = 1,
-	PositionMode = 2
+	APCControl_Pressure = 1,
+	APCControl_Position = 2
 };
 
 class ProcessUnit: public SmartUnit,
@@ -93,6 +94,7 @@ private:
 	float get_last_position();
 	void create_wafer(int unit, unsigned short slot);
 	void remove_wafer(int unit, unsigned short slot);
+	void process_recipe_step(unsigned int index, const RecipeStep& recipe_step);
 
 private:
 	bool m_proc_dirty_flag;
@@ -100,6 +102,9 @@ private:
 	int m_load_unload_count;
 
 	float m_leak_check_init_pressure;
+
+	boost::chrono::time_point<boost::chrono::system_clock> m_recipe_start_time;
+	boost::chrono::time_point<boost::chrono::system_clock> m_step_start_time;
 
 };
 

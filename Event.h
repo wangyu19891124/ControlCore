@@ -20,5 +20,9 @@ extern SystemEvent PumpTimeout;
 extern SystemEvent PumpError;
 extern SystemEvent UnknownWaferSize;
 extern SystemEvent LoadUnloadTimeout;
+extern SystemEvent VentTimeout;
+extern SystemEvent ChamberNotClean;
+extern SystemEvent ChamberNotVacuum;
+extern SystemEvent ProcessAlarm;
 
 }

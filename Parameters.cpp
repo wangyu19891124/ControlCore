@@ -29,23 +29,21 @@ ParameterItem<float> ChuckPatrolEnd(1005,"ChuckPatrolEnd","Chuck","chuck patrol 
 
 //Flow
 ParameterItem<unsigned> EtOHFlow(2001,"EtOHFlow","Flow","Etoh flow value",0,1000,300,"sccm");
-ParameterItem<unsigned> EtOHFlowWarn(2002,"EtOHFlowWarn","Flow","Etoh flow warn value",0,1000,500,"sccm");
-ParameterItem<unsigned> EtOHFlowAlarm(2003,"EtOHFlowAlarm","Flow","Etoh flow alarm value",0,1000,800,"sccm");
 ParameterItem<unsigned> HFFlow(2004,"HFFlow","Flow","HF flow value",0,1000,300,"sccm");
-ParameterItem<unsigned> HFFlowWarn(2005,"HFFlowWarn","Flow","HF flow warn value",0,1000,500,"sccm");
-ParameterItem<unsigned> HFFlowAlarm(2006,"HFFlowAlarm","Flow","HF flow alarm value",0,1000,800,"sccm");
 ParameterItem<unsigned> N2Flow(2007,"N2Flow","Flow","N2 flow value",0,1000,300,"sccm");
-ParameterItem<unsigned> N2FlowWarn(2008,"N2FlowWarn","Flow","N2 flow warn value",0,1000,500,"sccm");
-ParameterItem<unsigned> N2FlowAlarm(2009,"N2FlowAlarm","Flow","N2 flow alarm value",0,1000,800,"sccm");
 ParameterItem<unsigned> PurgeN2Flow(2010,"PurgeN2Flow","Flow","Purge N2 flow value",0,1000,300,"sccm");
-ParameterItem<unsigned> PurgeN2FlowWarn(2011,"PurgeN2FlowWarn","Flow","Purge N2 flow warn value",0,1000,500,"sccm");
-ParameterItem<unsigned> PurgeN2FlowAlarm(2012,"PurgeN2FlowAlarm","Flow","Purge N2 flow alarm value",0,1000,800,"sccm");
+ParameterItem<unsigned> FlowWarnProportion(2011,"FlowWarnProportion","Flow","Warning proportion of flow rate.",0,100,5,"%");
+ParameterItem<unsigned> FlowWarnMinimum(2012,"FlowWarnMinimum","Flow","Minimum warning of flow rate.",0,1000,50,"sccm");
+ParameterItem<unsigned> FlowAlarmProportion(2013,"FlowAlarmProportion","Flow","Alarm proportion of flow rate.",0,100,5,"%");
+ParameterItem<unsigned> FlowAlarmMinimum(2014,"FlowAlarmMinimum","Flow","Minimum alarm of flow rate.",0,1000,50,"sccm");
 
 
 //Pressure
 ParameterItem<float> ATMPressure(3001,"ATMPressure","Pressure","ATM pressure",600,800,730,"torr");
 ParameterItem<float> VacuumPressure(3002,"VacuumPressure","Pressure","Vacuum pressure",0,100,10,"torr");
 ParameterItem<float> PressureDiffAllowance(3003,"PressureDiffAllowance","Pressure","Pressure difference allowance",0,100,60,"torr");
+ParameterItem<float> PressureWarnOffset(3005, "PressureWarnOffset", "Pressure", "Relative pressure offset of warning to setting value.", 0, 50, 10, "torr");
+ParameterItem<float> PressureAlarmOffset(3006, "PressureAlarmOffset", "Pressure", "Relative pressure offset of alarm to setting value.", 0, 50, 20, "torr");
 
 
 //Purge
@@ -87,6 +85,12 @@ ParameterItem<float> LeakCheckPressure(9000,"LeakCheckPressure","LeakCheck","Ini
 ParameterItem<unsigned> LeakCheckPumpHoldTime(9001,"LeakCheckPumpHoldTime","LeakCheck","Time for keep pumping after reaching leak check pressure.",0,600,30,"s");
 ParameterItem<unsigned> LeakCheckTime(9002,"LeakCheckTime","LeakCheck","Leak check time.",0,3600,1200,"s");
 ParameterItem<float> LeakCheckThreshold(9003,"LeakCheckThreshold","LeakCheck","Leak check threshold, pass if less than this value.",0,10,5,"torr/min");
+
+
+//Vent
+ParameterItem<unsigned> VentProcTimeout(10000,"VentProcTimeout","Vent","Vent process chamber timeout.",0,100,60,"s");
+ParameterItem<unsigned> VentExpTimeout(10001,"VentExpTimeout","Vent","Vent expansion chamber timeout.",0,100,60,"s");
+ParameterItem<unsigned> ExpVentFlowrate(10002,"ExpVentFlowrate","Vent","Expansion chamber vent flow rate.",0,5000,2000,"sccm");
 
 }
 

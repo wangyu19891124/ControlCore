@@ -11,7 +11,7 @@
 #include "boost/property_tree/ptree.hpp"
 #include "boost/property_tree/json_parser.hpp"
 
-enum APCMode
+enum APCMode : unsigned short
 {
 	APCMode_Position,
 	APCMode_Pressure,

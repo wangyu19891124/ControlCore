@@ -99,16 +99,16 @@ extern SystemData<unsigned> doHFRequest;
 extern SystemData<unsigned> doN2PurgeGasValve;
 extern SystemData<unsigned> doExpCbVacValve;
 extern SystemData<unsigned> doExpCbVapVacValve;
-extern SystemData<unsigned> doAlcMFCBypassVal1;
-extern SystemData<unsigned> doAlcMFCBypassVal2;
-extern SystemData<unsigned> doAlcMFCBypassVal3;
+extern SystemData<unsigned> doAlcMFCVal1;
+extern SystemData<unsigned> doAlcMFCVal2;
+extern SystemData<unsigned> doAlcMFCVal3;
 extern SystemData<unsigned> doVapSupplyN2Valve;
 extern SystemData<unsigned> doVapBypassValve;
-extern SystemData<unsigned> doA2cMFCBypassVal1;
-extern SystemData<unsigned> doA2cMFCBypassVal2;
-extern SystemData<unsigned> doA2cMFCBypassVal3;
-extern SystemData<unsigned> doA3cMFCBypassVal1;
-extern SystemData<unsigned> doA3cMFCBypassVal2;
+extern SystemData<unsigned> doHFMFCVal1;
+extern SystemData<unsigned> doHFMFCVal2;
+extern SystemData<unsigned> doHFMFCVal3;
+extern SystemData<unsigned> doPurgeN2MFCVal1;
+extern SystemData<unsigned> doPurgeN2MFCVal2;
 extern SystemData<unsigned> doVaVapValve;
 extern SystemData<unsigned> doVaHFValve;
 extern SystemData<unsigned> doVaSupplyIPAValve;
@@ -121,8 +121,8 @@ extern SystemData<unsigned> doN2PurgeHFVal;
 extern SystemData<unsigned> doExpCbSupplyCbVal;
 extern SystemData<unsigned> doN2SupplyVacVal;
 extern SystemData<unsigned> doN2SupplyProcVal;
-extern SystemData<unsigned> doA4cMFCBypassVal1;
-extern SystemData<unsigned> doA4cMFCBypassVal2;
+extern SystemData<unsigned> doN2MFCVal1;
+extern SystemData<unsigned> doN2MFCVal2;
 extern SystemData<unsigned> doPinUpVal;
 extern SystemData<unsigned> doVacFastProcCbVal;
 extern SystemData<unsigned> doVacSlowProcCbVal;
@@ -229,11 +229,15 @@ extern SystemData<float> aoN2FlowSetpoint;
 
 
 //user defined
-extern SystemData<unsigned> flag;
+extern SystemData<unsigned> TotalSteps;
+extern SystemData<unsigned> CurrentStep;
+
 extern SystemData<std::string> RecipeName;
 
 extern SystemData<unsigned> RecipeTotalTime;
 extern SystemData<unsigned> RecipeElapseTime;
+extern SystemData<unsigned> CurrentStepTime;
+extern SystemData<unsigned> StepElapseTime;
 
 extern SystemData<unsigned> LoadUnloadState;
 extern SystemData<unsigned> LoadUnloadSkip;

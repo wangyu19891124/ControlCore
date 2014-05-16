@@ -11,6 +11,7 @@
 #include "SystemParameter.h"
 #include "Interlock.h"
 #include "DataRecorder.h"
+#include "Monitor.h"
 #include "RecipeManager.h"
 #include "UnitManager.h"
 
@@ -24,6 +25,7 @@ extern "C" void Initialize()
 	SystemDataPool::Instance().Initialize();
 	Interlock::Instance().Initialize();
 	DataRecorder::Instance().Initialize();
+	Monitor::Instance().Initialize();
 	WaferManager::Instance().Initialize();
 	RecipeManager::Instance().Initialize();
 	UnitManager::Instance().Initialize();
@@ -34,6 +36,7 @@ extern "C" void Terminate()
 	UnitManager::Instance().Terminate();
 	RecipeManager::Instance().Terminate();
 	WaferManager::Instance().Terminate();
+	Monitor::Instance().Terminate();
 	DataRecorder::Instance().Terminate();
 	Interlock::Instance().Terminate();
 	SystemDataPool::Instance().Terminate();

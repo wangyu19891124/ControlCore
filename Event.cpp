@@ -24,6 +24,10 @@ namespace EVT
 	SystemEvent PumpError(1018, EVENT_LEVEL_ERROR, "Pump warning/alarm.");
 	SystemEvent UnknownWaferSize(1020, EVENT_LEVEL_ERROR, "Wafer size is unknown, wafer can't be created.");
 	SystemEvent LoadUnloadTimeout(1022, EVENT_LEVEL_ERROR, "Load/unload wafer timeout.");
+	SystemEvent VentTimeout(1024, EVENT_LEVEL_ERROR, "Vent %s chamber timeout.");
+	SystemEvent ChamberNotClean(1026, EVENT_LEVEL_WARNING, "%s chamber is not clean, please purge it before vent.");
+	SystemEvent ChamberNotVacuum(1028, EVENT_LEVEL_WARNING, "%s chamber isn't vacuum, can't process wafer.");
+	SystemEvent ProcessAlarm(1030, EVENT_LEVEL_WARNING, "Alarm reported in process.");
 }
 
 

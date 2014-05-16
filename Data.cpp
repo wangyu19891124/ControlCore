@@ -90,16 +90,16 @@ SystemData<unsigned> doHFRequest(1012,"doHFRequest","DO",0,1,0,0,1,12,0,1,true);
 SystemData<unsigned> doN2PurgeGBValve(1016,"doN2PurgeGBValve","DO",0,1,0,0,1,16,0,1,true);
 SystemData<unsigned> doExpCbVacValve(1018,"doExpCbVacValve","DO",0,1,0,0,1,18,0,1,true);
 SystemData<unsigned> doExpCbVapVacValve(1019,"doExpCbVapVacValve","DO",0,1,0,0,1,19,0,1,true);
-SystemData<unsigned> doAlcMFCBypassVal1(1021,"doAlcMFCBypassVal1","DO",0,1,0,0,1,21,0,1,true);
-SystemData<unsigned> doAlcMFCBypassVal2(1022,"doAlcMFCBypassVal2","DO",0,1,0,0,1,22,0,1,true);
-SystemData<unsigned> doAlcMFCBypassVal3(1023,"doAlcMFCBypassVal3","DO",0,1,0,0,1,23,0,1,true);
+SystemData<unsigned> doAlcMFCVal1(1021,"doAlcMFCVal1","DO",0,1,0,0,1,21,0,1,true);
+SystemData<unsigned> doAlcMFCVal2(1022,"doAlcMFCVal2","DO",0,1,0,0,1,22,0,1,true);
+SystemData<unsigned> doAlcMFCVal3(1023,"doAlcMFCVal3","DO",0,1,0,0,1,23,0,1,true);
 SystemData<unsigned> doVapSupplyN2Valve(1024,"doVapSupplyN2Valve","DO",0,1,0,0,1,24,0,1,true);
 SystemData<unsigned> doVapBypassValve(1025,"doVapBypassValve","DO",0,1,0,0,1,25,0,1,true);
-SystemData<unsigned> doA2cMFCBypassVal1(1026,"doA2cMFCBypassVal1","DO",0,1,0,0,1,26,0,1,true);
-SystemData<unsigned> doA2cMFCBypassVal2(1027,"doA2cMFCBypassVal2","DO",0,1,0,0,1,27,0,1,true);
-SystemData<unsigned> doA2cMFCBypassVal3(1028,"doA2cMFCBypassVal3","DO",0,1,0,0,1,28,0,1,true);
-SystemData<unsigned> doA3cMFCBypassVal1(1029,"doA3cMFCBypassVal1","DO",0,1,0,0,1,29,0,1,true);
-SystemData<unsigned> doA3cMFCBypassVal2(1030,"doA3cMFCBypassVal2","DO",0,1,0,0,1,30,0,1,true);
+SystemData<unsigned> doHFMFCVal1(1026,"doHFMFCVal1","DO",0,1,0,0,1,26,0,1,true);
+SystemData<unsigned> doHFMFCVal2(1027,"doHFMFCVal2","DO",0,1,0,0,1,27,0,1,true);
+SystemData<unsigned> doHFMFCVal3(1028,"doHFMFCVal3","DO",0,1,0,0,1,28,0,1,true);
+SystemData<unsigned> doPurgeN2MFCVal1(1029,"doPurgeN2MFCVal1","DO",0,1,0,0,1,29,0,1,true);
+SystemData<unsigned> doPurgeN2MFCVal2(1030,"doPurgeN2MFCVal2","DO",0,1,0,0,1,30,0,1,true);
 SystemData<unsigned> doVaVapValve(1032,"doVaVapValve","DO",0,1,0,0,1,32,0,1,true);
 SystemData<unsigned> doVaHFValve(1033,"doVaHFValve","DO",0,1,0,0,1,33,0,1,true);
 SystemData<unsigned> doVaSupplyIPAValve(1034,"doVaSupplyIPAValve","DO",0,1,0,0,1,34,0,1,true);
@@ -112,8 +112,8 @@ SystemData<unsigned> doN2PurgeHFVal(1040,"doN2PurgeHFVal","DO",0,1,0,0,1,40,0,1,
 SystemData<unsigned> doExpCbSupplyCbVal(1041,"doExpCbSupplyCbVal","DO",0,1,0,0,1,41,0,1,true);
 SystemData<unsigned> doN2SupplyVacVal(1048,"doN2SupplyVacVal","DO",0,1,0,0,1,48,0,1,true);
 SystemData<unsigned> doN2SupplyProcVal(1049,"doN2SupplyProcVal","DO",0,1,0,0,1,49,0,1,true);
-SystemData<unsigned> doA4cMFCBypassVal1(1050,"doA4cMFCBypassVal1","DO",0,1,0,0,1,50,0,1,true);
-SystemData<unsigned> doA4cMFCBypassVal2(1051,"doA4cMFCBypassVal2","DO",0,1,0,0,1,51,0,1,true);
+SystemData<unsigned> doN2MFCVal1(1050,"doN2MFCVal1","DO",0,1,0,0,1,50,0,1,true);
+SystemData<unsigned> doN2MFCVal2(1051,"doN2MFCVal2","DO",0,1,0,0,1,51,0,1,true);
 SystemData<unsigned> doPinUpVal(1052,"doPinUpVal","DO",0,1,0,0,1,52,0,1,true);
 SystemData<unsigned> doVacFastProcCbVal(1056,"doVacFastProcCbVal","DO",0,1,0,0,1,56,0,1,true);
 SystemData<unsigned> doVacSlowProcCbVal(1057,"doVacSlowProcCbVal","DO",0,1,0,0,1,57,0,1,true);
@@ -230,10 +230,13 @@ SystemData<float> aoN2FlowSetpoint(8036, "aoN2FlowSetpoint","DeviceNet",0,5000,0
 
 
 //user defined
-SystemData<unsigned> flag(100011, "flag", "UserDefine", 0, 1000);
+SystemData<unsigned> TotalSteps(100011, "TotalSteps", "UserDefine", 0, 1000);
+SystemData<unsigned> CurrentStep(100012, "CurrentStep", "UserDefine", 0, 1000);
 SystemData<std::string> RecipeName(100013, "RecipeName", "UserDefine");
 SystemData<unsigned> RecipeTotalTime(100014, "RecipeTotalTime", "UserDefine", 0, 1000, 0, "s");
 SystemData<unsigned> RecipeElapseTime(100015, "RecipeElapseTime", "UserDefine", 0, 1000, 0, "s");
+SystemData<unsigned> CurrentStepTime(100016, "CurrentStepTime", "UserDefine", 0, 1000, 0, "s");
+SystemData<unsigned> StepElapseTime(100017, "StepElapseTime", "UserDefine", 0, 1000, 0, "s");
 
 SystemData<unsigned> LoadUnloadState(100018, "LoadUnloadState", "UserDefine", 0, 1);
 SystemData<unsigned> LoadUnloadSkip(100019, "LoadUnloadSkip", "UserDefine", 0, 1);

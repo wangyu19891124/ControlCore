@@ -7,24 +7,25 @@
 
 #include "boost/make_shared.hpp"
 #include "boost/date_time/posix_time/ptime.hpp"
+#include "boost/algorithm/string.hpp"
 
 #include "DataRecorder.h"
 #include "Database.h"
 
 
-RecordItem::RecordItem(RecordItemID id, const std::string& name, bool enable)
-	: m_id(id), m_name(name), m_enable_flag(enable)
+RecordItem::RecordItem(const std::string& name, bool enable)
+	: m_name(name), m_enable_flag(enable)
 {
 }
 
 bool RecordItem::operator == (const RecordItem& rhs)
 {
-	return m_id == rhs.m_id;
+	return boost::algorithm::equals(m_name, rhs.m_name);
 }
 
-RecordItemID RecordItem::GetID()
+bool RecordItem::IsName(const std::string& name)
 {
-	return m_id;
+	return boost::algorithm::equals(m_name, name);
 }
 
 void RecordItem::Enable()
@@ -38,8 +39,8 @@ void RecordItem::Disable()
 }
 
 
-IntervalRecordItem::IntervalRecordItem(RecordItemID id, const std::string& name, unsigned interval, boost::function<float ()> f, bool enable)
-	: RecordItem(id, name, enable), m_interval(interval), m_f(f)
+IntervalRecordItem::IntervalRecordItem(const std::string& name, unsigned interval, boost::function<float ()> f, bool enable)
+	: RecordItem(name, enable), m_interval(interval), m_f(f)
 {
 	m_last_record_time = boost::chrono::system_clock::now();
 }
@@ -61,8 +62,8 @@ void IntervalRecordItem::Monitor()
 }
 
 
-SwitchRecordItem::SwitchRecordItem(RecordItemID id, const std::string& name, boost::function<unsigned ()> f, bool enable)
-	: RecordItem(id, name, enable), m_old_value(0), m_f(f)
+SwitchRecordItem::SwitchRecordItem(const std::string& name, boost::function<unsigned ()> f, bool enable)
+	: RecordItem(name, enable), m_old_value(0), m_f(f)
 {
 }
 
@@ -109,12 +110,12 @@ void DataRecorder::Terminate()
 	m_items.clear();
 }
 
-void DataRecorder::Enable(RecordItemID id)
+void DataRecorder::Enable(const std::string& name)
 {
 	boost::mutex::scoped_lock lock(m_mtx);
 	for(auto& item : m_items)
 	{
-		if(item->GetID() == id)
+		if(item->IsName(name))
 		{
 			item->Enable();
 			break;
@@ -122,12 +123,12 @@ void DataRecorder::Enable(RecordItemID id)
 	}
 }
 
-void DataRecorder::Disable(RecordItemID id)
+void DataRecorder::Disable(const std::string& name)
 {
 	boost::mutex::scoped_lock lock(m_mtx);
 	for(auto& item : m_items)
 	{
-		if(item->GetID() == id)
+		if(item->IsName(name))
 		{
 			item->Disable();
 			break;
@@ -149,10 +150,10 @@ void DataRecorder::Add(boost::shared_ptr<RecordItem> item)
 	m_items.push_back(item);
 }
 
-void DataRecorder::Remove(RecordItemID id)
+void DataRecorder::Remove(const std::string& name)
 {
 	boost::mutex::scoped_lock lock(m_mtx);
-	m_items.remove_if([id](boost::shared_ptr<RecordItem>& x){return x->GetID() == id;});
+	m_items.remove_if([&name](boost::shared_ptr<RecordItem>& x){return x->IsName(name);});
 }
 
 void DataRecorder::monitor()
