@@ -70,9 +70,9 @@ void MonitorItem::Monitor()
 		if(m_report_flag < 2)
 		{
 			m_alarm_evt(value, alarm_low, alarm_high);
-			m_report_flag = 2;
 			m_level = 2;
 		}
+		m_report_flag = 2;
 		return;
 	}
 
@@ -81,12 +81,12 @@ void MonitorItem::Monitor()
 		if(m_report_flag < 1)
 		{
 			m_warn_evt(value, alarm_low, alarm_high);
-			m_report_flag = 1;
 			if(m_level < 1)
 			{
 				m_level = 1;
 			}
 		}
+		m_report_flag = 1;
 		return;
 	}
 
